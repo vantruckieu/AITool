@@ -116,6 +116,37 @@ body.ai-theme h1 {
 #aiIdeaInput:disabled { opacity: .55; filter: grayscale(.08); cursor: not-allowed; }
 .ai-advice-box { margin-top: 12px; border-radius: 10px; padding: 10px; border: 1px solid rgba(149, 113, 255, 0.6); background: rgba(30, 15, 55, 0.65); color: #f1e6ff; font-size: 13px; line-height: 1.45; }
 .ai-advice-box b { color: #dcb4ff; }
+
+.ai-conn-bar {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(7, 16, 34, 0.92);
+    border: 1px solid rgba(86, 154, 255, 0.55);
+    box-shadow: 0 0 20px rgba(72, 133, 255, 0.28);
+    color: #dff0ff;
+    font-size: 12px;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+.ai-conn-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2f9dff;
+    box-shadow: 0 0 10px rgba(47,157,255,.9);
+    animation: aiDotPulse 1.8s ease-in-out infinite;
+}
+.ai-conn-bar.state-stable .ai-conn-dot { background: #2f9dff; box-shadow: 0 0 10px rgba(47,157,255,.9); }
+.ai-conn-bar.state-degraded .ai-conn-dot { background: #ffd84a; box-shadow: 0 0 10px rgba(255,216,74,.9); }
+.ai-conn-bar.state-offline .ai-conn-dot { background: #ff6262; box-shadow: 0 0 10px rgba(255,98,98,.9); }
+@keyframes aiDotPulse { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.18); opacity: 1; } }
 .logic-inline { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
 .logic-inline .custom-select-wrapper { flex: 1 1 0; min-width: 0; }
 .ai-provider-inline { width: 100%; }
@@ -286,7 +317,9 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
     h1 { font-size: 24px; }
     .ai-log-panel { display: block; margin-top: 12px; padding: 10px; }
     .ai-log-list { max-height: 220px; }
+    .ai-conn-bar { right: 10px; bottom: 10px; font-size: 11px; padding: 7px 10px; }
 }
+
 </style>
 </head>
 
@@ -600,6 +633,12 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
     </div>
 </div>
 
+
+<div id="aiConnBar" class="ai-conn-bar hidden state-stable" title="Màu chấm trạng thái dịch vụ AI: Xanh lam = ổn định, Vàng = gián đoạn nhẹ, Đỏ = mất kết nối.">
+    <span class="ai-conn-dot" aria-hidden="true"></span>
+    <span id="aiConnText">AI Đã kết nối</span>
+</div>
+
 <footer>
     <span id="lblLanguage">Ngôn ngữ:</span>
     <select onchange="changeLang(this.value)"><option value="vi">🇻🇳 VI</option><option value="en">🇬🇧 EN</option></select>
@@ -624,6 +663,7 @@ let aiApiKey = "";
 let aiProvider = "gemini";
 let aiLogs = [];
 let aiInputMode = "raw";
+let aiServiceHealth = "stable";
 
 function getAiProviderSelect(tab) {
     return document.getElementById(tab === 'pose' ? 'aiProviderPose' : 'aiProviderAnime');
@@ -642,6 +682,7 @@ function syncProviderUI() {
 function applyAiThemeMode() {
     document.body.classList.toggle('ai-theme', isAiConnected);
     document.body.classList.toggle('gemini-neon', isAiConnected && aiProvider === 'gemini');
+    updateAiConnBar();
 }
 
 function shouldShowAiModeWrap() {
@@ -679,6 +720,30 @@ function setAiAdvice(msg) {
     }
     box.classList.remove('hidden');
     box.innerHTML = `<b>AI Advice:</b> ${escapeHtml(msg)}`;
+}
+
+
+function setAiServiceHealth(state) {
+    aiServiceHealth = state;
+    updateAiConnBar();
+}
+
+function updateAiConnBar() {
+    const bar = document.getElementById('aiConnBar');
+    const txt = document.getElementById('aiConnText');
+    if(!bar || !txt) return;
+    if(!isAiConnected) {
+        bar.classList.add('hidden');
+        return;
+    }
+    bar.classList.remove('hidden');
+    bar.classList.remove('state-stable','state-degraded','state-offline');
+    const safeState = ['stable','degraded','offline'].includes(aiServiceHealth) ? aiServiceHealth : 'stable';
+    bar.classList.add(`state-${safeState}`);
+    txt.textContent = currentLang === 'vi' ? 'AI Đã kết nối' : 'AI Connected';
+    bar.title = currentLang === 'vi'
+        ? 'Màu chấm trạng thái dịch vụ AI: Xanh lam = ổn định, Vàng = gián đoạn nhẹ, Đỏ = mất kết nối.'
+        : 'AI service dot colors: Blue = stable, Yellow = slight interruption, Red = disconnected.';
 }
 
 function syncAiProviderFrom(tab) {
@@ -828,6 +893,7 @@ async function connectAi() {
     } else {
         localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
     }
+    setAiServiceHealth("stable");
     applyAiThemeMode();
     syncProviderUI();
     if(aiProvider === 'gemini') {
@@ -839,6 +905,7 @@ async function connectAi() {
 
 function disconnectAi(skipNotice = false) {
     aiApiKey = ""; isAiConnected = false;
+    setAiServiceHealth("offline");
     localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
     document.getElementById("aiApiKey").value = "";
     applyAiThemeMode();
@@ -897,6 +964,7 @@ async function fetchAiKeys(promptText, wantsAdvice = false) {
         response_format: { type: "json_object" }
     };
     try {
+        setAiServiceHealth("degraded");
         let res, data, keys;
         addAiLog('request.prompt', `Input summary: ${summarizeForLog(promptText)}`);
         addAiLog('request.provider', aiProvider);
@@ -916,6 +984,7 @@ async function fetchAiKeys(promptText, wantsAdvice = false) {
             keys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed.keys);
             const advice = extracted?.advice || parsed.advice || "";
             addAiLog('response.raw', `status=${parsed.status || 'n/a'}, confidence=${parsed.confidence || 'n/a'}, result=${summarizeForLog(JSON.stringify(keys || null), 120)}`);
+            setAiServiceHealth("stable");
             return { keys: Array.isArray(keys) ? keys : null, advice: wantsAdvice ? advice : "" };
         } else {
             addAiLog('request.body', `system+payload sent (${JSON.stringify(bodyGPT).length} chars)`);
@@ -930,11 +999,13 @@ async function fetchAiKeys(promptText, wantsAdvice = false) {
             keys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed.keys);
             const advice = extracted?.advice || parsed.advice || "";
             addAiLog('response.raw', `status=${parsed.status || 'n/a'}, confidence=${parsed.confidence || 'n/a'}, result=${summarizeForLog(JSON.stringify(keys || null), 120)}`);
+            setAiServiceHealth("stable");
             return { keys: Array.isArray(keys) ? keys : null, advice: wantsAdvice ? advice : "" };
         }
         return { keys: Array.isArray(keys) ? keys : null, advice: "" };
     } catch (e) {
         addAiLog('error', e.message);
+        setAiServiceHealth("offline");
         alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message); return { keys: null, advice: "" };
     }
 }
