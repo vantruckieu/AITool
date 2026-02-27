@@ -25,26 +25,42 @@ body {
 
 /* --- AI THEME (GEMINI STYLE) --- */
 body.ai-theme {
-    background: radial-gradient(circle at 20% 20%, #0c1424, #030610 70%);
+    background: radial-gradient(circle at 20% 20%, #14284a 0%, #0a1530 40%, #060b19 72%, #030610 100%);
+    position: relative;
+}
+body.ai-theme::before {
+    content: ""; position: fixed; inset: -25%; pointer-events: none; z-index: -1;
+    background:
+        radial-gradient(40% 35% at 25% 30%, rgba(66,133,244,0.42), transparent 70%),
+        radial-gradient(34% 30% at 75% 35%, rgba(155,114,203,0.36), transparent 72%),
+        radial-gradient(42% 40% at 50% 80%, rgba(68,196,255,0.24), transparent 75%);
+    filter: blur(22px) saturate(1.25);
+    animation: aiAmbientFlow 9s ease-in-out infinite alternate;
 }
 body.ai-theme .container {
-    background: linear-gradient(145deg, #091221, #0c182d);
-    border: 1px solid transparent;
-    box-shadow: 0 0 40px rgba(66, 133, 244, 0.15), inset 0 0 60px rgba(155, 114, 203, 0.05);
-    position: relative;
-    z-index: 1;
+    background: #04070f;
+    border: 1px solid rgba(66, 133, 244, 0.25);
+    box-shadow: 0 0 35px rgba(66, 133, 244, 0.12), inset 0 0 40px rgba(0, 0, 0, 0.6);
 }
 body.ai-theme .container::before {
-    content: ""; position: absolute; inset: -2px; border-radius: 22px;
+    content: ""; position: absolute; inset: 0; border-radius: 20px; padding: 1.5px;
     background: linear-gradient(45deg, #4285f4, #9b72cb, #d96570, #4285f4);
     background-size: 300% 300%;
     animation: aiGradient 4s ease infinite;
-    z-index: -1;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 @keyframes aiGradient {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+@keyframes aiAmbientFlow {
+    0% { transform: translate3d(-3%, -2%, 0) scale(1); opacity: .86; }
+    50% { transform: translate3d(2%, 1%, 0) scale(1.07); opacity: 1; }
+    100% { transform: translate3d(4%, -1%, 0) scale(1.12); opacity: .88; }
 }
 body.ai-theme h1 {
     background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #4285f4);
@@ -69,17 +85,49 @@ body.ai-theme h1 {
 }
 .ai-auth-box { margin-bottom: 20px; padding: 20px; background: rgba(0, 204, 255, 0.04); border: 1px dashed rgba(0, 204, 255, 0.3); border-radius: 12px; box-shadow: inset 0 0 15px rgba(0, 204, 255, 0.05); }
 .ai-pill { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.4); border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.1); }
-.logic-inline { display: flex; gap: 10px; align-items: center; }
-.logic-inline .custom-select-wrapper:first-child { flex: 1; }
-.ai-provider-inline { width: 220px; }
-.ai-log-panel { margin-top: 15px; border: 1px solid rgba(66,133,244,0.35); background: rgba(7,16,34,0.75); border-radius: 10px; padding: 12px; }
-.ai-log-title { font-size: 12px; color: #9ed8ff; margin-bottom: 8px; }
-.ai-log-list { max-height: 180px; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #cbe7ff; line-height: 1.45; }
-.ai-log-item { margin-bottom: 6px; border-left: 2px solid rgba(155,114,203,.7); padding-left: 8px; }
-.gemini-burst { position: fixed; top: 26px; right: 24px; width: 48px; height: 48px; pointer-events: none; opacity: 0; z-index: 99; }
-.gemini-burst.show { animation: gemBurst 1.1s ease-out; }
-.gemini-star { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, #fff 0 12%, #8ab4f8 45%, #9b72cb 70%, transparent 72%); }
-@keyframes gemBurst { 0% { opacity: 0; transform: scale(0.2) rotate(0deg);} 25% {opacity: 1;} 100% { opacity: 0; transform: scale(2.4) rotate(120deg);} }
+.logic-inline { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+.logic-inline .custom-select-wrapper { flex: 1 1 0; min-width: 0; }
+.ai-provider-inline { width: 100%; }
+.ai-log-panel { margin-top: 15px; border: 1px solid rgba(133, 181, 255, 0.7); background: rgba(3, 8, 20, 0.98); border-radius: 12px; padding: 12px; box-shadow: inset 0 0 28px rgba(58, 106, 196, 0.16); }
+.ai-log-title { font-size: 13px; color: #dff0ff; margin-bottom: 10px; font-weight: 700; }
+.ai-log-list { max-height: 340px; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #f0f8ff; line-height: 1.52; }
+.ai-log-item { margin-bottom: 10px; border-left: 2px solid rgba(155,114,203,.9); padding: 8px 8px 8px 10px; background: rgba(14, 23, 43, 0.95); border-radius: 8px; white-space: pre-wrap; word-break: break-word; }
+.ai-log-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.ai-log-type { font-size: 11px; color: #9ac4ff; font-weight: 700; text-transform: uppercase; letter-spacing: .2px; }
+.ai-log-time { font-size: 11px; color: #84a0c4; }
+.ai-log-msg { font-size: 12px; color: #f2f8ff; }
+.ai-log-msg details { margin-top: 4px; }
+.ai-log-msg summary { cursor: pointer; color: #9bc4ff; font-weight: 600; }
+.ai-log-msg pre { margin: 6px 0 0 0; padding: 8px; border-radius: 6px; background: rgba(5, 12, 25, 0.95); border: 1px solid rgba(126, 170, 244, 0.25); color: #eaf4ff; white-space: pre-wrap; word-break: break-word; font-family: inherit; }
+.ai-log-item.log-request { border-left-color: #8ab4f8; }
+.ai-log-item.log-response { border-left-color: #9b72cb; }
+.ai-log-item.log-error { border-left-color: #ff8a80; }
+
+.tool-gemini-burst { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; z-index: 3; }
+.tool-gemini-burst .gem-star {
+    position: absolute; width: 9px; height: 9px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #8ab4f8 35%, #9b72cb 70%, transparent 72%);
+    box-shadow: 0 0 14px rgba(138, 180, 248, 0.85);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+    animation: gemSpread 1.15s cubic-bezier(.16,.82,.21,1) forwards;
+}
+.tool-gemini-burst .gem-ring {
+    position: absolute; width: 12px; height: 12px; border-radius: 999px;
+    border: 2px solid rgba(138, 180, 248, 0.95);
+    transform: translate(-50%, -50%) scale(.1);
+    opacity: 0;
+    animation: gemRingExpand 1.05s ease-out forwards;
+}
+@keyframes gemSpread {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.08); }
+    10% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.9); }
+}
+@keyframes gemRingExpand {
+    0% { opacity: .86; transform: translate(-50%, -50%) scale(.08); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(22); }
+}
 /* -------------------------- */
 
 h1 { margin: 0 0 10px 0; font-size: 28px; text-align: center; color: #00ccff; text-shadow: 0 0 20px rgba(0,200,255,0.6); transition: 0.5s; }
@@ -87,9 +135,11 @@ h1 { margin: 0 0 10px 0; font-size: 28px; text-align: center; color: #00ccff; te
 
 .container {
     background: linear-gradient(145deg, #0e1624, #111c2f);
+    z-index: 1;
     padding: 35px; border-radius: 20px; width: 100%; max-width: 600px; 
     box-shadow: 0 0 40px rgba(0,140,255,0.25), inset 0 0 60px rgba(0,80,160,0.15);
     border: 1px solid rgba(0,180,255,0.2); box-sizing: border-box; transition: 0.5s;
+    position: relative; isolation: isolate;
 }
 
 .tabs { display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
@@ -208,8 +258,6 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
 
 <body>
 
-<div id="geminiBurst" class="gemini-burst"><div class="gemini-star"></div></div>
-
 <div id="globalAiAuth" class="hidden ai-auth-box">
     <div class="row">
         <label><span id="lblAiKey">API Key</span></label>
@@ -226,6 +274,7 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
 <div class="intro" id="introText">Công cụ đa năng hỗ trợ Animation Timing, Tính toán Frame và Render.</div>
 
 <div class="container">
+    <div id="toolGeminiBurst" class="tool-gemini-burst"></div>
     <div class="tabs">
         <button id="tabConvert" class="active" onclick="switchTab('convert')">Time / Frame</button>
         <button id="tabAnime" onclick="switchTab('anime')">Anime, Toon Frame</button>
@@ -538,12 +587,62 @@ function syncAiProviderFrom(tab) {
     addAiLog('config', `Provider switched to ${aiProvider}`);
 }
 
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 function addAiLog(type, message) {
     const stamp = new Date().toLocaleTimeString('vi-VN', { hour12: false });
-    aiLogs.unshift(`[${stamp}] ${type.toUpperCase()}: ${message}`);
-    aiLogs = aiLogs.slice(0, 20);
+    const rawMsg = String(message);
+    aiLogs.unshift({ stamp, type, message: rawMsg });
+    aiLogs = aiLogs.slice(0, 40);
     const box = document.getElementById('aiLogList');
-    if(box) box.innerHTML = aiLogs.map(line => `<div class="ai-log-item">${line.replace(/</g, '&lt;')}</div>`).join('');
+    if(!box) return;
+    box.innerHTML = aiLogs.map(item => {
+        const level = item.type.startsWith('response') ? 'response' : item.type.startsWith('error') ? 'error' : 'request';
+        const cleanMsg = escapeHtml(item.message);
+        const longMsg = cleanMsg.length > 260 || cleanMsg.includes('\n');
+        const msgHtml = longMsg
+            ? `<details open><summary>Xem chi tiết</summary><pre>${cleanMsg}</pre></details>`
+            : `<div>${cleanMsg}</div>`;
+        return `<div class="ai-log-item log-${level}">
+            <div class="ai-log-meta"><span class="ai-log-type">${escapeHtml(item.type)}</span><span class="ai-log-time">${escapeHtml(item.stamp)}</span></div>
+            <div class="ai-log-msg">${msgHtml}</div>
+        </div>`;
+    }).join('');
+}
+
+function playGeminiSpread(sourceEl) {
+    const wrap = document.getElementById('toolGeminiBurst');
+    if(!wrap) return;
+    const hostRect = wrap.getBoundingClientRect();
+    const srcRect = sourceEl?.getBoundingClientRect?.() || hostRect;
+    const cx = Math.max(10, Math.min(hostRect.width - 10, (srcRect.left + srcRect.width / 2) - hostRect.left));
+    const cy = Math.max(10, Math.min(hostRect.height - 10, (srcRect.top + srcRect.height / 2) - hostRect.top));
+
+    const ring = document.createElement('span');
+    ring.className = 'gem-ring';
+    ring.style.left = `${cx}px`;
+    ring.style.top = `${cy}px`;
+    wrap.appendChild(ring);
+    setTimeout(() => ring.remove(), 1100);
+
+    for(let i = 0; i < 42; i++) {
+        const angle = (Math.PI * 2 * i) / 42;
+        const radius = 85 + Math.random() * 250;
+        const star = document.createElement('span');
+        star.className = 'gem-star';
+        star.style.left = `${cx}px`;
+        star.style.top = `${cy}px`;
+        star.style.setProperty('--dx', `${Math.cos(angle) * radius}px`);
+        star.style.setProperty('--dy', `${Math.sin(angle) * radius}px`);
+        star.style.animationDelay = `${Math.random() * 0.16}s`;
+        wrap.appendChild(star);
+        setTimeout(() => star.remove(), 1400);
+    }
 }
 
 async function validateAiKey(provider, key) {
@@ -603,8 +702,7 @@ async function connectAi() {
     document.body.classList.add("ai-theme");
     syncProviderUI();
     if(aiProvider === 'gemini') {
-        const burst = document.getElementById('geminiBurst');
-        burst.classList.remove('show'); void burst.offsetWidth; burst.classList.add('show');
+        playGeminiSpread(document.getElementById('globalAiAuth'));
     }
     addAiLog('response', `Connected ${aiProvider}. Persist=${shouldSave ? 'yes' : 'session only'}`);
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
@@ -656,8 +754,13 @@ async function fetchAiKeys(promptText) {
     };
     try {
         let res, data, keys;
-        addAiLog('request', promptText.slice(0, 180));
+        addAiLog('request.prompt', promptText);
+        addAiLog('request.provider', aiProvider);
+        addAiLog('request.http', aiProvider === 'gemini'
+            ? 'POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+            : 'POST https://api.openai.com/v1/chat/completions');
         if (aiProvider === 'gemini') {
+            addAiLog('request.body', JSON.stringify(bodyGemini, null, 2));
             res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${aiApiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bodyGemini)
             });
@@ -665,8 +768,9 @@ async function fetchAiKeys(promptText) {
             if(data.error) throw new Error(data.error.message);
             let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
             let parsed = JSON.parse(text); keys = parsed.keys || parsed;
-            addAiLog('response', text.slice(0, 220));
+            addAiLog('response.raw', text);
         } else {
+            addAiLog('request.body', JSON.stringify(bodyGPT, null, 2));
             res = await fetch(`https://api.openai.com/v1/chat/completions`, {
                 method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${aiApiKey}` }, body: JSON.stringify(bodyGPT)
             });
@@ -674,7 +778,7 @@ async function fetchAiKeys(promptText) {
             if(data.error) throw new Error(data.error.message);
             const content = data.choices?.[0]?.message?.content || '{}';
             let parsed = JSON.parse(content); keys = parsed.keys || parsed;
-            addAiLog('response', content.slice(0, 220));
+            addAiLog('response.raw', content);
         }
         return Array.isArray(keys) ? keys : null;
     } catch (e) {
