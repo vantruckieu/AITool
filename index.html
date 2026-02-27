@@ -315,6 +315,17 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
     <span style="font-size:13px; color:#9ed8ff;"><span id="txtAiConnected">✨ Đã kết nối với</span> <b id="aiProviderName" class="ai-text-glow">Gemini</b></span>
     <span style="font-size:12px; color:#ff6b6b; cursor:pointer; font-weight:bold; padding:4px 8px; background:rgba(255,107,107,0.1); border-radius:6px;" onclick="disconnectAi()" id="btnDisconnectAi">Ngắt kết nối</span>
 </div>
+<div id="aiInputModeWrap" class="ai-input-mode hidden">
+    <div class="ai-mode-tabs">
+        <button type="button" class="ai-mode-tab active" id="aiModeRawBtn" onclick="setAiInputMode('raw')">Dữ liệu thô</button>
+        <button type="button" class="ai-mode-tab" id="aiModeIdeaBtn" onclick="setAiInputMode('idea')">Chia sẻ ý tưởng</button>
+    </div>
+    <div id="aiIdeaPanel" class="ai-idea-panel hidden">
+        <div class="ai-privacy-warn">⚠ Dữ liệu bạn nhập sẽ được xử lý bởi AI đã chọn. Vui lòng cân nhắc quyền riêng tư. Hệ thống từ chối trách nhiệm với dữ liệu gửi lên dịch vụ AI.</div>
+        <label class="ai-privacy-check"><input type="checkbox" id="aiIdeaConsent" onchange="toggleAiIdeaConsent()">Tôi đã hiểu và đồng ý chia sẻ dữ liệu với AI.</label>
+        <textarea id="aiIdeaInput" placeholder="Nhập ý tưởng, mục tiêu và ràng buộc keyframe..." disabled></textarea>
+    </div>
+</div>
 <h1 id="mainTitle">Timing & Render Tool</h1>
 <div class="intro" id="introText">Công cụ đa năng hỗ trợ Animation Timing, Tính toán Frame và Render.</div>
 
@@ -633,6 +644,11 @@ function applyAiThemeMode() {
     document.body.classList.toggle('gemini-neon', isAiConnected && aiProvider === 'gemini');
 }
 
+function shouldShowAiModeWrap() {
+    const animeAi = document.getElementById('calcLogic')?.value === 'ai';
+    const poseAi = document.getElementById('poseCalcMode')?.value === 'ai';
+    return isAiConnected && (animeAi || poseAi);
+}
 
 function setAiInputMode(mode) {
     aiInputMode = mode === 'idea' ? 'idea' : 'raw';
@@ -852,17 +868,15 @@ function injectAiUI(tabId, isAI) {
             logicRow.after(authBlock); authBlock.classList.remove("hidden"); pill.classList.add("hidden");
         } else {
             authBlock.classList.add("hidden");
-            logicRow.after(pill); pill.classList.remove("hidden");
-            if(modeWrap) {
-                pill.after(modeWrap);
-                modeWrap.classList.remove('hidden');
-            }
+            pill.classList.remove("hidden");
+            modeWrap.classList.toggle('hidden', !shouldShowAiModeWrap());
             document.getElementById("aiProviderName").innerText = aiProvider === 'gemini' ? 'Gemini' : 'ChatGPT';
         }
     } else {
         if(modeWrap) modeWrap.classList.add('hidden');
         authBlock.classList.add("hidden");
-        pill.classList.add("hidden");
+        pill.classList.toggle("hidden", !isAiConnected);
+        modeWrap.classList.toggle('hidden', !shouldShowAiModeWrap());
         logPanel.classList.add('hidden');
     }
 }
