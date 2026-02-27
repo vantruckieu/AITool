@@ -35,7 +35,7 @@ body.ai-theme::before {
         radial-gradient(34% 30% at 75% 35%, rgba(155,114,203,0.36), transparent 72%),
         radial-gradient(42% 40% at 50% 80%, rgba(68,196,255,0.24), transparent 75%);
     filter: blur(22px) saturate(1.25);
-    animation: aiAmbientFlow 9s ease-in-out infinite alternate;
+    animation: aiAmbientFlow 4.8s ease-in-out infinite alternate;
 }
 body.ai-theme .container {
     background: #04070f;
@@ -43,7 +43,7 @@ body.ai-theme .container {
     box-shadow: 0 0 35px rgba(66, 133, 244, 0.12), inset 0 0 40px rgba(0, 0, 0, 0.6);
 }
 body.ai-theme .container::before {
-    content: ""; position: absolute; inset: 0; border-radius: 20px; padding: 1.5px;
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
     background: linear-gradient(45deg, #4285f4, #9b72cb, #d96570, #4285f4);
     background-size: 300% 300%;
     animation: aiGradient 4s ease infinite;
@@ -61,6 +61,24 @@ body.ai-theme .container::before {
     0% { transform: translate3d(-3%, -2%, 0) scale(1); opacity: .86; }
     50% { transform: translate3d(2%, 1%, 0) scale(1.07); opacity: 1; }
     100% { transform: translate3d(4%, -1%, 0) scale(1.12); opacity: .88; }
+}
+
+body.ai-theme.gemini-neon::before {
+    background:
+        radial-gradient(44% 40% at 22% 28%, rgba(190,72,255,0.62), transparent 66%),
+        radial-gradient(40% 34% at 76% 34%, rgba(132,77,255,0.60), transparent 70%),
+        radial-gradient(46% 46% at 52% 82%, rgba(112,0,255,0.44), transparent 76%);
+    filter: blur(16px) saturate(1.6) brightness(1.2);
+    animation-duration: 2.2s;
+}
+body.ai-theme.gemini-neon .container {
+    border-color: rgba(180, 98, 255, 0.95);
+    box-shadow: 0 0 52px rgba(138, 72, 255, 0.42), 0 0 18px rgba(168, 90, 255, 0.55), inset 0 0 45px rgba(16, 0, 34, 0.88);
+}
+body.ai-theme.gemini-neon .container::before {
+    background: linear-gradient(90deg, #7f3bff 0 48%, #2f9dff 52% 100%);
+    background-size: 220% 220%;
+    animation: aiGradient 1.2s linear infinite;
 }
 body.ai-theme h1 {
     background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #4285f4);
@@ -85,6 +103,50 @@ body.ai-theme h1 {
 }
 .ai-auth-box { margin-bottom: 20px; padding: 20px; background: rgba(0, 204, 255, 0.04); border: 1px dashed rgba(0, 204, 255, 0.3); border-radius: 12px; box-shadow: inset 0 0 15px rgba(0, 204, 255, 0.05); }
 .ai-pill { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.4); border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.1); }
+.ai-input-mode { margin-top: 12px; }
+.ai-mode-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.ai-mode-tab { background: rgba(14,28,50,.88); border: 1px solid rgba(132,77,255,.5); color: #dac9ff; border-radius: 10px; padding: 10px 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: .2s; }
+.ai-mode-tab.active { background: linear-gradient(90deg, rgba(134,73,255,.85), rgba(33,161,255,.78)); color: #fff; border-color: rgba(198,170,255,.95); box-shadow: 0 0 16px rgba(117,77,255,.4); }
+.ai-idea-panel { border: 1px dashed rgba(179,140,255,.5); border-radius: 10px; padding: 10px; background: rgba(20, 10, 40, 0.45); }
+.ai-privacy-warn { font-size: 12px; color: #f7d5ff; background: rgba(182, 67, 255, 0.18); border: 1px solid rgba(228, 153, 255, 0.5); border-radius: 8px; padding: 8px; margin-bottom: 8px; line-height: 1.45; }
+.ai-privacy-check { font-size: 12px; color: #d6e9ff; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ai-privacy-check input { accent-color: #b06aff; }
+#aiIdeaInput { width: 100%; min-height: 120px; resize: vertical; padding: 14px; font-size: 15px; font-family: inherit; background: #0a1422; border: 1px solid #1e3a5f; border-radius: 10px; color: #e6f3ff; box-sizing: border-box; transition: .25s; line-height: 1.45; }
+#aiIdeaInput:focus { outline: none; border-color: #00ccff; box-shadow: 0 0 10px rgba(0,200,255,.35); }
+#aiIdeaInput:disabled { opacity: .55; filter: grayscale(.08); cursor: not-allowed; }
+.ai-advice-box { margin-top: 12px; border-radius: 10px; padding: 10px; border: 1px solid rgba(149, 113, 255, 0.6); background: rgba(30, 15, 55, 0.65); color: #f1e6ff; font-size: 13px; line-height: 1.45; }
+.ai-advice-box b { color: #dcb4ff; }
+
+.ai-conn-bar {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(7, 16, 34, 0.92);
+    border: 1px solid rgba(86, 154, 255, 0.55);
+    box-shadow: 0 0 20px rgba(72, 133, 255, 0.28);
+    color: #dff0ff;
+    font-size: 12px;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+.ai-conn-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2f9dff;
+    box-shadow: 0 0 10px rgba(47,157,255,.9);
+    animation: aiDotPulse 1.8s ease-in-out infinite;
+}
+.ai-conn-bar.state-stable .ai-conn-dot { background: #2f9dff; box-shadow: 0 0 10px rgba(47,157,255,.9); }
+.ai-conn-bar.state-degraded .ai-conn-dot { background: #ffd84a; box-shadow: 0 0 10px rgba(255,216,74,.9); }
+.ai-conn-bar.state-offline .ai-conn-dot { background: #ff6262; box-shadow: 0 0 10px rgba(255,98,98,.9); }
+@keyframes aiDotPulse { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.18); opacity: 1; } }
 .logic-inline { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
 .logic-inline .custom-select-wrapper { flex: 1 1 0; min-width: 0; }
 .ai-provider-inline { width: 100%; }
@@ -110,14 +172,14 @@ body.ai-theme h1 {
     box-shadow: 0 0 14px rgba(138, 180, 248, 0.85);
     transform: translate(-50%, -50%) scale(0.2);
     opacity: 0;
-    animation: gemSpread 1.15s cubic-bezier(.16,.82,.21,1) forwards;
+    animation: gemSpread 1.95s cubic-bezier(.16,.82,.21,1) forwards;
 }
 .tool-gemini-burst .gem-ring {
     position: absolute; width: 12px; height: 12px; border-radius: 999px;
     border: 2px solid rgba(138, 180, 248, 0.95);
     transform: translate(-50%, -50%) scale(.1);
     opacity: 0;
-    animation: gemRingExpand 1.05s ease-out forwards;
+    animation: gemRingExpand 1.8s ease-out forwards;
 }
 @keyframes gemSpread {
     0% { opacity: 0; transform: translate(-50%, -50%) scale(0.08); }
@@ -138,7 +200,7 @@ h1 { margin: 0 0 10px 0; font-size: 28px; text-align: center; color: #00ccff; te
     z-index: 1;
     padding: 35px; border-radius: 20px; width: 100%; max-width: 600px; 
     box-shadow: 0 0 40px rgba(0,140,255,0.25), inset 0 0 60px rgba(0,80,160,0.15);
-    border: 1px solid rgba(0,180,255,0.2); box-sizing: border-box; transition: 0.5s;
+    border: 1px solid rgba(0,180,255,0.35); box-sizing: border-box; transition: 0.5s;
     position: relative; isolation: isolate;
 }
 
@@ -250,9 +312,14 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
 
 @media (max-width: 600px) {
     body { padding: 20px 10px 50px 10px; }
-    .container { padding: 25px 20px; border-radius: 15px; }
+    .container { padding: 25px 20px; border-radius: 15px; border-width: 1px; }
+    .container::before { inset: -1px; border-radius: inherit; }
     h1 { font-size: 24px; }
+    .ai-log-panel { display: block; margin-top: 12px; padding: 10px; }
+    .ai-log-list { max-height: 220px; }
+    .ai-conn-bar { right: 10px; bottom: 10px; font-size: 11px; padding: 7px 10px; }
 }
+
 </style>
 </head>
 
@@ -269,6 +336,17 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
 <div id="globalAiPill" class="hidden ai-pill">
     <span style="font-size:13px; color:#9ed8ff;"><span id="txtAiConnected">✨ Đã kết nối với</span> <b id="aiProviderName" class="ai-text-glow">Gemini</b></span>
     <span style="font-size:12px; color:#ff6b6b; cursor:pointer; font-weight:bold; padding:4px 8px; background:rgba(255,107,107,0.1); border-radius:6px;" onclick="disconnectAi()" id="btnDisconnectAi">Ngắt kết nối</span>
+</div>
+<div id="aiInputModeWrap" class="ai-input-mode hidden">
+    <div class="ai-mode-tabs">
+        <button type="button" class="ai-mode-tab active" id="aiModeRawBtn" onclick="setAiInputMode('raw')">Dữ liệu thô</button>
+        <button type="button" class="ai-mode-tab" id="aiModeIdeaBtn" onclick="setAiInputMode('idea')">Chia sẻ ý tưởng</button>
+    </div>
+    <div id="aiIdeaPanel" class="ai-idea-panel hidden">
+        <div class="ai-privacy-warn">⚠ Dữ liệu bạn nhập sẽ được xử lý bởi AI đã chọn. Vui lòng cân nhắc quyền riêng tư. Hệ thống từ chối trách nhiệm với dữ liệu gửi lên dịch vụ AI.</div>
+        <label class="ai-privacy-check"><input type="checkbox" id="aiIdeaConsent" onchange="toggleAiIdeaConsent()">Tôi đã hiểu và đồng ý chia sẻ dữ liệu với AI.</label>
+        <textarea id="aiIdeaInput" placeholder="Nhập ý tưởng, mục tiêu và ràng buộc keyframe..." disabled></textarea>
+    </div>
 </div>
 <h1 id="mainTitle">Timing & Render Tool</h1>
 <div class="intro" id="introText">Công cụ đa năng hỗ trợ Animation Timing, Tính toán Frame và Render.</div>
@@ -527,6 +605,7 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
         <div class="ai-log-title">AI Request / Response Log</div>
         <div id="aiLogList" class="ai-log-list"></div>
     </div>
+    <div id="aiAdviceBox" class="ai-advice-box hidden"></div>
 
     <div id="renderMode" class="hidden">
         <div class="tab-desc" id="descRender">Ước tính tổng thời gian xuất file (Render) của toàn bộ dự án dựa trên thời gian chạy 1 khung hình.</div>
@@ -541,6 +620,12 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
         <div class="result" id="renderOutput">—</div>
         <div class="warning" id="warningTextRender">⚠ Chỉ dùng để tham khảo. Mật độ chi tiết cảnh thực tế sẽ làm đổi thời gian.</div>
     </div>
+</div>
+
+
+<div id="aiConnBar" class="ai-conn-bar hidden state-stable" title="Màu chấm trạng thái dịch vụ AI: Xanh lam = ổn định, Vàng = gián đoạn nhẹ, Đỏ = mất kết nối.">
+    <span class="ai-conn-dot" aria-hidden="true"></span>
+    <span id="aiConnText">AI Đã kết nối</span>
 </div>
 
 <footer>
@@ -566,6 +651,8 @@ let isAiConnected = false;
 let aiApiKey = "";
 let aiProvider = "gemini";
 let aiLogs = [];
+let aiInputMode = "raw";
+let aiServiceHealth = "stable";
 
 function getAiProviderSelect(tab) {
     return document.getElementById(tab === 'pose' ? 'aiProviderPose' : 'aiProviderAnime');
@@ -581,8 +668,89 @@ function syncProviderUI() {
     });
 }
 
+function applyAiThemeMode() {
+    document.body.classList.toggle('ai-theme', isAiConnected);
+    document.body.classList.toggle('gemini-neon', isAiConnected && aiProvider === 'gemini');
+    updateAiConnBar();
+}
+
+function shouldShowAiModeWrap() {
+    const animeAi = document.getElementById('calcLogic')?.value === 'ai';
+    const poseAi = document.getElementById('poseCalcMode')?.value === 'ai';
+    return isAiConnected && (animeAi || poseAi);
+}
+
+function setAiInputMode(mode) {
+    aiInputMode = mode === 'idea' ? 'idea' : 'raw';
+    const rawBtn = document.getElementById('aiModeRawBtn');
+    const ideaBtn = document.getElementById('aiModeIdeaBtn');
+    const ideaPanel = document.getElementById('aiIdeaPanel');
+    if(rawBtn) rawBtn.classList.toggle('active', aiInputMode === 'raw');
+    if(ideaBtn) ideaBtn.classList.toggle('active', aiInputMode === 'idea');
+    if(ideaPanel) ideaPanel.classList.toggle('hidden', aiInputMode !== 'idea');
+    toggleAnimePoseInput();
+    togglePoseSettings();
+}
+
+function toggleAiIdeaConsent() {
+    const consent = document.getElementById('aiIdeaConsent');
+    const input = document.getElementById('aiIdeaInput');
+    if(input) input.disabled = !consent?.checked;
+    if(input && input.disabled) input.value = '';
+}
+
+function setAiAdvice(msg) {
+    const box = document.getElementById('aiAdviceBox');
+    if(!box) return;
+    if(!msg) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+    }
+    box.classList.remove('hidden');
+    box.innerHTML = `<b>AI Advice:</b> ${escapeHtml(msg)}`;
+}
+
+
+function setAiServiceHealth(state) {
+    aiServiceHealth = state;
+    updateAiConnBar();
+}
+
+function updateAiConnBar() {
+    const bar = document.getElementById('aiConnBar');
+    const txt = document.getElementById('aiConnText');
+    if(!bar || !txt) return;
+    if(!isAiConnected) {
+        bar.classList.add('hidden');
+        return;
+    }
+    bar.classList.remove('hidden');
+    bar.classList.remove('state-stable','state-degraded','state-offline');
+    const safeState = ['stable','degraded','offline'].includes(aiServiceHealth) ? aiServiceHealth : 'stable';
+    bar.classList.add(`state-${safeState}`);
+    txt.textContent = currentLang === 'vi' ? 'AI Đã kết nối' : 'AI Connected';
+    bar.title = currentLang === 'vi'
+        ? 'Màu chấm trạng thái dịch vụ AI: Xanh lam = ổn định, Vàng = gián đoạn nhẹ, Đỏ = mất kết nối.'
+        : 'AI service dot colors: Blue = stable, Yellow = slight interruption, Red = disconnected.';
+}
+
 function syncAiProviderFrom(tab) {
-    aiProvider = getAiProviderSelect(tab).value;
+    const selectedProvider = getAiProviderSelect(tab).value;
+    if(selectedProvider === aiProvider) return;
+
+    if(isAiConnected) {
+        const wantsDisconnect = confirm(currentLang === 'vi'
+            ? 'Đổi mô hình sẽ ngắt kết nối AI hiện tại. Bạn có muốn tiếp tục không?'
+            : 'Changing model will disconnect the current AI session. Continue?');
+        if(!wantsDisconnect) {
+            syncProviderUI();
+            return;
+        }
+        disconnectAi(true);
+    }
+
+    aiProvider = selectedProvider;
     syncProviderUI();
     addAiLog('config', `Provider switched to ${aiProvider}`);
 }
@@ -604,15 +772,32 @@ function addAiLog(type, message) {
     box.innerHTML = aiLogs.map(item => {
         const level = item.type.startsWith('response') ? 'response' : item.type.startsWith('error') ? 'error' : 'request';
         const cleanMsg = escapeHtml(item.message);
-        const longMsg = cleanMsg.length > 260 || cleanMsg.includes('\n');
-        const msgHtml = longMsg
-            ? `<details open><summary>Xem chi tiết</summary><pre>${cleanMsg}</pre></details>`
-            : `<div>${cleanMsg}</div>`;
+        const msgHtml = `<div>${cleanMsg}</div>`;
         return `<div class="ai-log-item log-${level}">
             <div class="ai-log-meta"><span class="ai-log-type">${escapeHtml(item.type)}</span><span class="ai-log-time">${escapeHtml(item.stamp)}</span></div>
             <div class="ai-log-msg">${msgHtml}</div>
         </div>`;
     }).join('');
+}
+
+function summarizeForLog(value, maxLen = 180) {
+    const compact = String(value || '')
+        .replace(/\s+/g, ' ')
+        .replace(/[{}\[\]"]+/g, '')
+        .trim();
+    return compact.length > maxLen ? `${compact.slice(0, maxLen)}...` : compact;
+}
+
+function buildAiSystemInstruction() {
+    return [
+        'Bạn là engine logic trong web tool tính toán.',
+        'Chỉ xử lý dữ liệu người dùng cung cấp, không trả lời ngoài phạm vi.',
+        'Không cảm xúc, không markdown, không icon, không văn bản thừa.',
+        'BẮT BUỘC trả JSON hợp lệ theo format:',
+        '{"status":"success|error","analysis":"ngắn","result":"kết quả chính","confidence":"high|medium|low"}',
+        'Nếu thiếu dữ liệu thì status=error, result=null, confidence=low.',
+        'Với bài toán này, result PHẢI là mảng số nguyên keyframe (ví dụ [1,5,9]) hoặc object có keys và advice ngắn.'
+    ].join(' ');
 }
 
 function playGeminiSpread(sourceEl) {
@@ -628,7 +813,7 @@ function playGeminiSpread(sourceEl) {
     ring.style.left = `${cx}px`;
     ring.style.top = `${cy}px`;
     wrap.appendChild(ring);
-    setTimeout(() => ring.remove(), 1100);
+    setTimeout(() => ring.remove(), 2000);
 
     for(let i = 0; i < 42; i++) {
         const angle = (Math.PI * 2 * i) / 42;
@@ -641,7 +826,7 @@ function playGeminiSpread(sourceEl) {
         star.style.setProperty('--dy', `${Math.sin(angle) * radius}px`);
         star.style.animationDelay = `${Math.random() * 0.16}s`;
         wrap.appendChild(star);
-        setTimeout(() => star.remove(), 1400);
+        setTimeout(() => star.remove(), 2300);
     }
 }
 
@@ -665,12 +850,12 @@ async function validateAiKey(provider, key) {
 }
 
 function initAI() {
-    let savedKey = localStorage.getItem("aiApiKey") || sessionStorage.getItem("aiApiKey");
+    let savedKey = localStorage.getItem("aiApiKey");
     if(savedKey) {
         aiApiKey = savedKey;
-        aiProvider = localStorage.getItem("aiProvider") || sessionStorage.getItem("aiProvider") || 'gemini';
+        aiProvider = localStorage.getItem("aiProvider") || 'gemini';
         isAiConnected = true;
-        document.body.classList.add("ai-theme");
+        applyAiThemeMode();
         syncProviderUI();
         addAiLog('system', `Recovered ${aiProvider} connection from browser storage`);
     }
@@ -694,27 +879,29 @@ async function connectAi() {
         : 'Connected successfully. Do you want to remember this API key in this browser?');
     if(shouldSave) {
         localStorage.setItem("aiApiKey", key); localStorage.setItem("aiProvider", aiProvider);
-        sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     } else {
-        sessionStorage.setItem("aiApiKey", key); sessionStorage.setItem("aiProvider", aiProvider);
         localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
     }
-    document.body.classList.add("ai-theme");
+    setAiServiceHealth("stable");
+    applyAiThemeMode();
     syncProviderUI();
     if(aiProvider === 'gemini') {
         playGeminiSpread(document.getElementById('globalAiAuth'));
     }
-    addAiLog('response', `Connected ${aiProvider}. Persist=${shouldSave ? 'yes' : 'session only'}`);
+    addAiLog('response', `Connected ${aiProvider}. Persist=${shouldSave ? 'yes' : 'no'}`);
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
-function disconnectAi() {
+function disconnectAi(skipNotice = false) {
     aiApiKey = ""; isAiConnected = false;
+    setAiServiceHealth("offline");
     localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
-    sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     document.getElementById("aiApiKey").value = "";
-    document.body.classList.remove("ai-theme");
+    applyAiThemeMode();
     addAiLog('system', 'Disconnected AI service and cleared local/session key');
+    if(!skipNotice) {
+        alert(currentLang === 'vi' ? 'Đã ngắt kết nối AI.' : 'AI disconnected.');
+    }
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
@@ -722,68 +909,91 @@ function injectAiUI(tabId, isAI) {
     let authBlock = document.getElementById("globalAiAuth");
     let pill = document.getElementById("globalAiPill");
     let logPanel = document.getElementById('aiLogPanel');
+    let modeWrap = document.getElementById('aiInputModeWrap');
     let logicRow = document.getElementById(tabId === 'anime' ? "rowLogicA" : "rowLogicP");
+    let modePanel = document.getElementById(tabId === 'anime' ? 'animeMode' : 'poseMode');
 
     if(isAI) {
+        if(modePanel && logPanel && logPanel.parentElement !== modePanel) modePanel.appendChild(logPanel);
         logPanel.classList.remove('hidden');
+        if(!document.getElementById('aiLogList').innerHTML.trim()) {
+            addAiLog('system', currentLang === 'vi' ? 'Log AI đang bật trên thiết bị này.' : 'AI log is active on this device.');
+        }
         if(!isAiConnected) {
             logicRow.after(authBlock); authBlock.classList.remove("hidden"); pill.classList.add("hidden");
         } else {
-            authBlock.classList.add("hidden"); logicRow.after(pill); pill.classList.remove("hidden");
+            authBlock.classList.add("hidden");
+            pill.classList.remove("hidden");
+            modeWrap.classList.toggle('hidden', !shouldShowAiModeWrap());
             document.getElementById("aiProviderName").innerText = aiProvider === 'gemini' ? 'Gemini' : 'ChatGPT';
         }
     } else {
         authBlock.classList.add("hidden");
-        pill.classList.add("hidden");
+        pill.classList.toggle("hidden", !isAiConnected);
+        modeWrap.classList.toggle('hidden', !shouldShowAiModeWrap());
         logPanel.classList.add('hidden');
     }
 }
 
-async function fetchAiKeys(promptText) {
+async function fetchAiKeys(promptText, wantsAdvice = false) {
+    const systemInstruction = buildAiSystemInstruction();
     const bodyGemini = {
+        systemInstruction: { parts: [{ text: systemInstruction }] },
         contents: [{ parts: [{ text: promptText }] }],
         generationConfig: { response_mime_type: "application/json" }
     };
     const bodyGPT = {
         model: "gpt-4o-mini",
         messages: [
-            { role: "system", content: "You are a professional animation timing assistant. You MUST output ONLY a valid JSON object with a single property 'keys' which is an array of integers representing frame numbers. Example format: {\"keys\": [1, 3, 5, 7]}" },
+            { role: "system", content: systemInstruction },
             { role: "user", content: promptText }
         ],
         response_format: { type: "json_object" }
     };
     try {
+        setAiServiceHealth("degraded");
         let res, data, keys;
-        addAiLog('request.prompt', promptText);
+        addAiLog('request.prompt', `Input summary: ${summarizeForLog(promptText)}`);
         addAiLog('request.provider', aiProvider);
         addAiLog('request.http', aiProvider === 'gemini'
             ? 'POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
             : 'POST https://api.openai.com/v1/chat/completions');
         if (aiProvider === 'gemini') {
-            addAiLog('request.body', JSON.stringify(bodyGemini, null, 2));
+            addAiLog('request.body', `system+payload sent (${JSON.stringify(bodyGemini).length} chars)`);
             res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${aiApiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bodyGemini)
             });
             data = await res.json();
             if(data.error) throw new Error(data.error.message);
             let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-            let parsed = JSON.parse(text); keys = parsed.keys || parsed;
-            addAiLog('response.raw', text);
+            let parsed = JSON.parse(text);
+            const extracted = parsed.result || parsed;
+            keys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed.keys);
+            const advice = extracted?.advice || parsed.advice || "";
+            addAiLog('response.raw', `status=${parsed.status || 'n/a'}, confidence=${parsed.confidence || 'n/a'}, result=${summarizeForLog(JSON.stringify(keys || null), 120)}`);
+            setAiServiceHealth("stable");
+            return { keys: Array.isArray(keys) ? keys : null, advice: wantsAdvice ? advice : "" };
         } else {
-            addAiLog('request.body', JSON.stringify(bodyGPT, null, 2));
+            addAiLog('request.body', `system+payload sent (${JSON.stringify(bodyGPT).length} chars)`);
             res = await fetch(`https://api.openai.com/v1/chat/completions`, {
                 method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${aiApiKey}` }, body: JSON.stringify(bodyGPT)
             });
             data = await res.json();
             if(data.error) throw new Error(data.error.message);
             const content = data.choices?.[0]?.message?.content || '{}';
-            let parsed = JSON.parse(content); keys = parsed.keys || parsed;
-            addAiLog('response.raw', content);
+            let parsed = JSON.parse(content);
+            const extracted = parsed.result || parsed;
+            keys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed.keys);
+            const advice = extracted?.advice || parsed.advice || "";
+            addAiLog('response.raw', `status=${parsed.status || 'n/a'}, confidence=${parsed.confidence || 'n/a'}, result=${summarizeForLog(JSON.stringify(keys || null), 120)}`);
+            setAiServiceHealth("stable");
+            return { keys: Array.isArray(keys) ? keys : null, advice: wantsAdvice ? advice : "" };
         }
-        return Array.isArray(keys) ? keys : null;
+        return { keys: Array.isArray(keys) ? keys : null, advice: "" };
     } catch (e) {
         addAiLog('error', e.message);
-        alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message); return null;
+        setAiServiceHealth("offline");
+        alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message); return { keys: null, advice: "" };
     }
 }
 
@@ -794,22 +1004,41 @@ async function generateWithAi(tab) {
     btn.disabled = true;
 
     let promptText = "";
+    const isIdeaMode = aiInputMode === "idea";
+    const ideaText = (document.getElementById("aiIdeaInput")?.value || "").trim();
+    const hasConsent = !!document.getElementById("aiIdeaConsent")?.checked;
+    setAiAdvice("");
     if (tab === 'anime') {
         let sfRaw = parseInt(document.getElementById("startFrame").value); let efRaw = parseInt(document.getElementById("endFrame").value);
         let sf = isNaN(sfRaw) ? 1 : Math.min(sfRaw, isNaN(efRaw)?100:efRaw); let ef = isNaN(efRaw) ? 100 : Math.max(sfRaw||1, efRaw);
         let style = document.getElementById("animStyle").value; let poses = document.getElementById("poseCount").value || 5;
         let pacing = document.getElementById("corePacingAnime").value; let curve = document.getElementById("curveTypeAnime").value;
-        promptText = `I am animating a sequence. Start frame: ${sf}. End frame: ${ef}. Style: On ${style}s. Main keyframes: ${poses}. pacing='${pacing}', curve='${curve}'. Return ONLY JSON: {"keys": [integers]}.`;
+        if(isIdeaMode) {
+            if(!hasConsent) { alert(currentLang === "vi" ? "Bạn cần đồng ý cảnh báo quyền riêng tư trước." : "Please accept the privacy warning first."); btn.innerHTML = oriText; btn.disabled = false; return; }
+            if(!ideaText) { alert(currentLang === "vi" ? "Hãy nhập ý tưởng để AI phân tích." : "Please provide your idea."); btn.innerHTML = oriText; btn.disabled = false; return; }
+            promptText = `Bạn là engine dựng keyframe. Bối cảnh anime: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Ý tưởng người dùng: ${ideaText}. Trả JSON hợp lệ: {"status":"success|error","analysis":"ngắn","result":{"keys":[integers],"advice":"lời khuyên ngắn"},"confidence":"high|medium|low"}.`;
+        } else {
+            promptText = `Nhiệm vụ: tính keyframe chính cho animation. Dữ liệu: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Xuất JSON chuẩn, result là mảng số nguyên keyframe.`;
+        }
     } else {
         let secRaw = parseFloat(document.getElementById("poseSeconds").value); let sec = isNaN(secRaw) || secRaw <= 0 ? 1 : secRaw;
         let fps = parseFloat(document.getElementById("fpsPose").value) || 24; let style = document.getElementById("animStylePose").value;
         let focus = document.getElementById("focusTypePose").value; let action = focus === 'char' ? document.getElementById("focusActionChar").value : document.getElementById("focusActionObj").value;
         let pacing = document.getElementById("corePacingPose").value; let totalFrames = Math.max(1, Math.round(sec * fps));
-        promptText = `Estimate main keyframes for ${sec}s at ${fps}fps, total 1..${totalFrames}, style On ${style}s, focus=${focus}, action=${action}, pacing=${pacing}. Return ONLY JSON: {"keys": [integers]}.`;
+        if(isIdeaMode) {
+            if(!hasConsent) { alert(currentLang === "vi" ? "Bạn cần đồng ý cảnh báo quyền riêng tư trước." : "Please accept the privacy warning first."); btn.innerHTML = oriText; btn.disabled = false; return; }
+            if(!ideaText) { alert(currentLang === "vi" ? "Hãy nhập ý tưởng để AI phân tích." : "Please provide your idea."); btn.innerHTML = oriText; btn.disabled = false; return; }
+            promptText = `Bạn là engine dựng keyframe. Bối cảnh pose: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Ý tưởng người dùng: ${ideaText}. Trả JSON hợp lệ: {"status":"success|error","analysis":"ngắn","result":{"keys":[integers],"advice":"lời khuyên ngắn"},"confidence":"high|medium|low"}.`;
+        } else {
+            promptText = `Nhiệm vụ: ước tính keyframe chính. Dữ liệu: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Xuất JSON chuẩn, result là mảng số nguyên keyframe.`;
+        }
     }
 
-    let keys = await fetchAiKeys(promptText);
+    let aiResult = await fetchAiKeys(promptText, isIdeaMode);
+    let keys = aiResult?.keys || null;
     btn.innerHTML = oriText; btn.disabled = false;
+
+    if (aiResult?.advice) setAiAdvice(aiResult.advice);
 
     if (keys && keys.length > 0) {
         if(tab === 'anime') updateAnime(keys);
@@ -1348,7 +1577,7 @@ function toggleAnimePoseInput() {
     injectAiUI('anime', isAI);
     document.getElementById('aiProviderAnime').classList.toggle('hidden', !isAI);
 
-    let hideParams = isAI && !isAiConnected;
+    let hideParams = isAI && (!isAiConnected || aiInputMode === "idea");
     document.getElementById("animeParams").classList.toggle("hidden", hideParams);
     document.getElementById("btnGenerateAiA").classList.toggle("hidden", !isAI);
 
@@ -1486,7 +1715,7 @@ function togglePoseSettings() {
     injectAiUI('pose', isAI);
     document.getElementById('aiProviderPose').classList.toggle('hidden', !isAI);
 
-    let hideParams = isAI && !isAiConnected;
+    let hideParams = isAI && (!isAiConnected || aiInputMode === "idea");
     document.getElementById("poseParams").classList.toggle("hidden", hideParams);
     document.getElementById("btnGenerateAiP").classList.toggle("hidden", !isAI);
 
@@ -1717,7 +1946,7 @@ function updateAllCustomSelects() { document.querySelectorAll("select").forEach(
 // ================================================================
 window.addEventListener("DOMContentLoaded", ()=>{
     updateCustomLUT('anime'); updateCustomLUT('pose'); initCustomSelects(); changeLang('vi');
-    togglePoseActions(); togglePoseSettings(); toggleAnimePoseInput(); initAI();
+    togglePoseActions(); togglePoseSettings(); toggleAnimePoseInput(); initAI(); setAiInputMode("raw"); toggleAiIdeaConsent();
     document.getElementById("poseCalcMode").addEventListener('change', function() { if (this.value === "random") { currentRandomSec = null; updatePoseEst(); } });
 });
 </script>
