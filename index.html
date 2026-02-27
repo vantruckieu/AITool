@@ -35,7 +35,7 @@ body.ai-theme::before {
         radial-gradient(34% 30% at 75% 35%, rgba(155,114,203,0.36), transparent 72%),
         radial-gradient(42% 40% at 50% 80%, rgba(68,196,255,0.24), transparent 75%);
     filter: blur(22px) saturate(1.25);
-    animation: aiAmbientFlow 9s ease-in-out infinite alternate;
+    animation: aiAmbientFlow 4.8s ease-in-out infinite alternate;
 }
 body.ai-theme .container {
     background: #04070f;
@@ -61,6 +61,23 @@ body.ai-theme .container::before {
     0% { transform: translate3d(-3%, -2%, 0) scale(1); opacity: .86; }
     50% { transform: translate3d(2%, 1%, 0) scale(1.07); opacity: 1; }
     100% { transform: translate3d(4%, -1%, 0) scale(1.12); opacity: .88; }
+}
+
+body.ai-theme.gemini-neon::before {
+    background:
+        radial-gradient(42% 36% at 22% 28%, rgba(0,255,255,0.5), transparent 68%),
+        radial-gradient(38% 32% at 76% 34%, rgba(140,82,255,0.46), transparent 72%),
+        radial-gradient(44% 44% at 52% 82%, rgba(0,184,255,0.32), transparent 76%);
+    filter: blur(18px) saturate(1.45) brightness(1.15);
+    animation-duration: 3.6s;
+}
+body.ai-theme.gemini-neon .container {
+    border-color: rgba(0, 238, 255, 0.52);
+    box-shadow: 0 0 42px rgba(0, 210, 255, 0.28), inset 0 0 45px rgba(0, 18, 38, 0.82);
+}
+body.ai-theme.gemini-neon .container::before {
+    background: linear-gradient(45deg, #00f0ff, #8a6dff, #31d5ff, #00f0ff);
+    animation-duration: 2.8s;
 }
 body.ai-theme h1 {
     background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #4285f4);
@@ -254,6 +271,8 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
     body { padding: 20px 10px 50px 10px; }
     .container { padding: 25px 20px; border-radius: 15px; }
     h1 { font-size: 24px; }
+    .ai-log-panel { display: block; margin-top: 12px; padding: 10px; }
+    .ai-log-list { max-height: 220px; }
 }
 </style>
 </head>
@@ -583,6 +602,11 @@ function syncProviderUI() {
     });
 }
 
+function applyAiThemeMode() {
+    document.body.classList.toggle('ai-theme', isAiConnected);
+    document.body.classList.toggle('gemini-neon', isAiConnected && aiProvider === 'gemini');
+}
+
 function syncAiProviderFrom(tab) {
     const selectedProvider = getAiProviderSelect(tab).value;
     if(selectedProvider === aiProvider) return;
@@ -703,7 +727,7 @@ function initAI() {
         aiApiKey = savedKey;
         aiProvider = localStorage.getItem("aiProvider") || sessionStorage.getItem("aiProvider") || 'gemini';
         isAiConnected = true;
-        document.body.classList.add("ai-theme");
+        applyAiThemeMode();
         syncProviderUI();
         addAiLog('system', `Recovered ${aiProvider} connection from browser storage`);
     }
@@ -732,7 +756,7 @@ async function connectAi() {
         sessionStorage.setItem("aiApiKey", key); sessionStorage.setItem("aiProvider", aiProvider);
         localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
     }
-    document.body.classList.add("ai-theme");
+    applyAiThemeMode();
     syncProviderUI();
     if(aiProvider === 'gemini') {
         playGeminiSpread(document.getElementById('globalAiAuth'));
@@ -746,7 +770,7 @@ function disconnectAi(skipNotice = false) {
     localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
     sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     document.getElementById("aiApiKey").value = "";
-    document.body.classList.remove("ai-theme");
+    applyAiThemeMode();
     addAiLog('system', 'Disconnected AI service and cleared local/session key');
     if(!skipNotice) {
         alert(currentLang === 'vi' ? 'Đã ngắt kết nối AI.' : 'AI disconnected.');
@@ -759,9 +783,14 @@ function injectAiUI(tabId, isAI) {
     let pill = document.getElementById("globalAiPill");
     let logPanel = document.getElementById('aiLogPanel');
     let logicRow = document.getElementById(tabId === 'anime' ? "rowLogicA" : "rowLogicP");
+    let modePanel = document.getElementById(tabId === 'anime' ? 'animeMode' : 'poseMode');
 
     if(isAI) {
+        if(modePanel && logPanel && logPanel.parentElement !== modePanel) modePanel.appendChild(logPanel);
         logPanel.classList.remove('hidden');
+        if(!document.getElementById('aiLogList').innerHTML.trim()) {
+            addAiLog('system', currentLang === 'vi' ? 'Log AI đang bật trên thiết bị này.' : 'AI log is active on this device.');
+        }
         if(!isAiConnected) {
             logicRow.after(authBlock); authBlock.classList.remove("hidden"); pill.classList.add("hidden");
         } else {
