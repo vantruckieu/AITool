@@ -652,6 +652,7 @@ function disconnectAi() {
     sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     document.getElementById("aiApiKey").value = "";
     document.body.classList.remove("ai-theme");
+    addAiLog('system', 'Disconnected AI service and cleared local/session key');
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
