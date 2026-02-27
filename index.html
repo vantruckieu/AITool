@@ -25,26 +25,42 @@ body {
 
 /* --- AI THEME (GEMINI STYLE) --- */
 body.ai-theme {
-    background: radial-gradient(circle at 20% 20%, #0c1424, #030610 70%);
+    background: radial-gradient(circle at 12% 18%, #0f1e3a 0%, #060d1e 45%, #040814 100%);
+    overflow-x: hidden;
+}
+body.ai-theme > * { position: relative; z-index: 1; }
+body.ai-theme::before {
+    content: "";
+    position: fixed;
+    inset: -20%;
+    background: conic-gradient(from 0deg, rgba(66,133,244,.25), rgba(155,114,203,.2), rgba(217,101,112,.18), rgba(66,133,244,.25));
+    filter: blur(90px) saturate(130%);
+    animation: aiBgSpin 18s linear infinite;
+    pointer-events: none;
+    z-index: 0;
 }
 body.ai-theme .container {
-    background: linear-gradient(145deg, #091221, #0c182d);
+    background: linear-gradient(145deg, rgba(9,18,33,.92), rgba(12,24,45,.9));
     border: 1px solid transparent;
-    box-shadow: 0 0 40px rgba(66, 133, 244, 0.15), inset 0 0 60px rgba(155, 114, 203, 0.05);
+    box-shadow: 0 0 40px rgba(66, 133, 244, 0.2), inset 0 0 60px rgba(155, 114, 203, 0.08);
     position: relative;
     z-index: 1;
 }
 body.ai-theme .container::before {
     content: ""; position: absolute; inset: -2px; border-radius: 22px;
-    background: linear-gradient(45deg, #4285f4, #9b72cb, #d96570, #4285f4);
-    background-size: 300% 300%;
-    animation: aiGradient 4s ease infinite;
+    background: linear-gradient(120deg, #4285f4, #5da0ff, #9b72cb, #d96570, #50b8ff, #4285f4);
+    background-size: 320% 320%;
+    animation: aiGradient 5s linear infinite;
     z-index: -1;
 }
 @keyframes aiGradient {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+@keyframes aiBgSpin {
+    from { transform: rotate(0deg) scale(1); }
+    to { transform: rotate(360deg) scale(1.06); }
 }
 body.ai-theme h1 {
     background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #4285f4);
@@ -69,6 +85,32 @@ body.ai-theme h1 {
 }
 .ai-auth-box { margin-bottom: 20px; padding: 20px; background: rgba(0, 204, 255, 0.04); border: 1px dashed rgba(0, 204, 255, 0.3); border-radius: 12px; box-shadow: inset 0 0 15px rgba(0, 204, 255, 0.05); }
 .ai-pill { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.4); border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.1); }
+.logic-inline { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr); gap: 10px; align-items: stretch; }
+.logic-inline .custom-select-wrapper { width: 100%; }
+.logic-inline .custom-select-trigger { min-height: 56px; align-items: center; }
+.ai-provider-inline { width: 100%; }
+.ai-log-panel { margin-top: 15px; border: 1px solid rgba(66,133,244,0.35); background: rgba(7,16,34,0.75); border-radius: 10px; padding: 12px; }
+.ai-log-title { font-size: 12px; color: #9ed8ff; margin-bottom: 8px; }
+.ai-log-list { max-height: 180px; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #cbe7ff; line-height: 1.45; }
+.ai-log-item { margin-bottom: 6px; border-left: 2px solid rgba(155,114,203,.7); padding-left: 8px; }
+.gemini-burst { position: fixed; top: 22px; right: 22px; width: 72px; height: 72px; pointer-events: none; opacity: 0; z-index: 99; }
+.gemini-burst.show { animation: gemBurst 1.25s cubic-bezier(.18,.8,.32,1); }
+.gemini-star {
+    position: absolute; inset: 18px; transform: rotate(45deg);
+    background: linear-gradient(135deg, #d7ebff, #8ab4f8 45%, #9b72cb 70%, #d96570);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    box-shadow: 0 0 22px rgba(138,180,248,.95);
+}
+.gemini-burst::before {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid rgba(138,180,248,.85);
+    box-shadow: 0 0 25px rgba(155,114,203,.7), 0 0 42px rgba(66,133,244,.65);
+}
+@keyframes gemBurst {
+    0% { opacity: 0; transform: scale(0.35) rotate(0deg);} 
+    22% {opacity: 1;}
+    100% { opacity: 0; transform: scale(2.9) rotate(140deg);} 
+}
 /* -------------------------- */
 
 h1 { margin: 0 0 10px 0; font-size: 28px; text-align: center; color: #00ccff; text-shadow: 0 0 20px rgba(0,200,255,0.6); transition: 0.5s; }
@@ -187,6 +229,11 @@ footer .custom-select-wrapper { width: auto; min-width: 110px; }
 footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radius: 6px; min-height: unset; }
 .note-text { font-size: 13px; color: #66ccff; margin-top: 6px; display: block; opacity: 0.8; }
 
+@media (max-width: 760px) {
+    .logic-inline { grid-template-columns: 1fr; }
+    .logic-inline .custom-select-trigger { min-height: 50px; }
+}
+
 @media (max-width: 600px) {
     body { padding: 20px 10px 50px 10px; }
     .container { padding: 25px 20px; border-radius: 15px; }
@@ -197,20 +244,12 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
 
 <body>
 
+<div id="geminiBurst" class="gemini-burst"><div class="gemini-star"></div></div>
+
 <div id="globalAiAuth" class="hidden ai-auth-box">
-    <div class="row">
-        <label><span id="lblAiProvider">Dịch vụ Mô hình AI</span></label>
-        <select id="aiProvider" onchange="updateAllCustomSelects()">
-            <option value="gemini">Google Gemini (Khuyên dùng)</option>
-            <option value="chatgpt">OpenAI ChatGPT</option>
-        </select>
-    </div>
     <div class="row">
         <label><span id="lblAiKey">API Key</span></label>
         <input type="password" id="aiApiKey" data-i18n-ph="phAiKey" placeholder="Nhập mã API Key của bạn...">
-    </div>
-    <div class="row" style="margin-bottom: 25px;">
-        <label class="checkbox-lbl"><input type="checkbox" id="aiSaveKey" checked> <span id="lblAiSave">Nhớ mã kết nối trên thiết bị này</span></label>
     </div>
     <button class="tabs button active ai-btn" onclick="connectAi()" style="width:100%; padding:14px; border-radius:10px; font-size:15px; font-weight:bold; cursor:pointer;" id="btnConnectAi">Kết nối Trợ Thủ AI</button>
 </div>
@@ -261,11 +300,17 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
         
         <div class="row" id="rowLogicA">
             <label><span id="lblCalcLogic">Logic tính toán</span><span class="tooltip" id="tipCalcLogic" data-tip="?">?</span></label>
-            <select id="calcLogic" onchange="toggleAnimePoseInput(); updateAnime()">
-                <option id="optLogicStrict" value="strict">Toán học nghiêm ngặt</option>
-                <option id="optLogicRandom" value="random">Xác suất ngẫu nhiên</option>
-                <option id="optLogicAI_A" value="ai">✨ Trợ Thủ AI</option>
-            </select>
+            <div class="logic-inline">
+                <select id="calcLogic" onchange="toggleAnimePoseInput(); updateAnime()">
+                    <option id="optLogicStrict" value="strict">Toán học nghiêm ngặt</option>
+                    <option id="optLogicRandom" value="random">Xác suất ngẫu nhiên</option>
+                    <option id="optLogicAI_A" value="ai">✨ Trợ Thủ AI</option>
+                </select>
+                <select id="aiProviderAnime" class="hidden ai-provider-inline" onchange="syncAiProviderFrom('anime')">
+                    <option value="gemini">Google Gemini (Khuyên dùng)</option>
+                    <option value="chatgpt">OpenAI ChatGPT</option>
+                </select>
+            </div>
         </div>
 
         <div id="animeParams">
@@ -360,11 +405,17 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
         
         <div class="row" id="rowLogicP">
             <label><span id="lblPoseCalcMode">Logic tính toán</span><span class="tooltip" id="tipPoseCalcMode" data-tip="?">?</span></label>
-            <select id="poseCalcMode" onchange="togglePoseSettings(); togglePoseCustom(); updatePoseEst()">
-                <option id="optPcalcSeconds" value="seconds" selected>Theo số giây cảnh (Toán học)</option>
-                <option id="optPcalcRandom" value="random">Xác suất ngẫu nhiên</option>
-                <option id="optLogicAI_P" value="ai">✨ Trợ Thủ AI</option>
-            </select>
+            <div class="logic-inline">
+                <select id="poseCalcMode" onchange="togglePoseSettings(); togglePoseCustom(); updatePoseEst()">
+                    <option id="optPcalcSeconds" value="seconds" selected>Theo số giây cảnh (Toán học)</option>
+                    <option id="optPcalcRandom" value="random">Xác suất ngẫu nhiên</option>
+                    <option id="optLogicAI_P" value="ai">✨ Trợ Thủ AI</option>
+                </select>
+                <select id="aiProviderPose" class="hidden ai-provider-inline" onchange="syncAiProviderFrom('pose')">
+                    <option value="gemini">Google Gemini (Khuyên dùng)</option>
+                    <option value="chatgpt">OpenAI ChatGPT</option>
+                </select>
+            </div>
         </div>
 
         <div id="poseParams">
@@ -459,6 +510,11 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
         <div class="warning" id="warnMathModelPose">⚠ Lưu ý: Hệ thống chỉ tính toán gợi ý vị trí lý thuyết, mật độ thực tế phụ thuộc bản vẽ.</div>
     </div>
 
+    <div id="aiLogPanel" class="ai-log-panel hidden">
+        <div class="ai-log-title">AI Request / Response Log</div>
+        <div id="aiLogList" class="ai-log-list"></div>
+    </div>
+
     <div id="renderMode" class="hidden">
         <div class="tab-desc" id="descRender">Ước tính tổng thời gian xuất file (Render) của toàn bộ dự án dựa trên thời gian chạy 1 khung hình.</div>
         <div class="row">
@@ -496,6 +552,54 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 let isAiConnected = false;
 let aiApiKey = "";
 let aiProvider = "gemini";
+let aiLogs = [];
+
+function getAiProviderSelect(tab) {
+    return document.getElementById(tab === 'pose' ? 'aiProviderPose' : 'aiProviderAnime');
+}
+
+function syncProviderUI() {
+    ['anime','pose'].forEach(tab => {
+        let sel = getAiProviderSelect(tab);
+        if(sel) {
+            sel.value = aiProvider;
+            if(sel.updateCustomUI) sel.updateCustomUI();
+        }
+    });
+}
+
+function syncAiProviderFrom(tab) {
+    aiProvider = getAiProviderSelect(tab).value;
+    syncProviderUI();
+    addAiLog('config', `Provider switched to ${aiProvider}`);
+}
+
+function addAiLog(type, message) {
+    const stamp = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+    aiLogs.unshift(`[${stamp}] ${type.toUpperCase()}: ${message}`);
+    aiLogs = aiLogs.slice(0, 20);
+    const box = document.getElementById('aiLogList');
+    if(box) box.innerHTML = aiLogs.map(line => `<div class="ai-log-item">${line.replace(/</g, '&lt;')}</div>`).join('');
+}
+
+async function validateAiKey(provider, key) {
+    try {
+        if(provider === 'gemini') {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error?.message || 'Gemini key invalid');
+        } else {
+            const res = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${key}` } });
+            const data = await res.json();
+            if(!res.ok || data.error) throw new Error(data.error?.message || 'OpenAI key invalid');
+        }
+        return true;
+    } catch (e) {
+        addAiLog('error', e.message);
+        alert((currentLang === 'vi' ? 'Không xác thực được API Key: ' : 'Failed to verify API Key: ') + e.message);
+        return false;
+    }
+}
 
 function initAI() {
     let savedKey = localStorage.getItem("aiApiKey") || sessionStorage.getItem("aiApiKey");
@@ -504,23 +608,41 @@ function initAI() {
         aiProvider = localStorage.getItem("aiProvider") || sessionStorage.getItem("aiProvider") || 'gemini';
         isAiConnected = true;
         document.body.classList.add("ai-theme");
-        let pSelect = document.getElementById("aiProvider");
-        if(pSelect) { pSelect.value = aiProvider; if(pSelect.updateCustomUI) pSelect.updateCustomUI(); }
+        syncProviderUI();
+        addAiLog('system', `Recovered ${aiProvider} connection from browser storage`);
     }
 }
 
-function connectAi() {
+async function connectAi() {
     let key = document.getElementById("aiApiKey").value.trim();
     if(!key) { alert(currentLang === 'vi' ? "Vui lòng nhập API Key!" : "Please enter API Key!"); return; }
+
+    const activeTab = document.getElementById('animeMode').classList.contains('hidden') ? 'pose' : 'anime';
+    aiProvider = getAiProviderSelect(activeTab).value;
+    addAiLog('request', `Connecting ${aiProvider}...`);
+
+    const ok = await validateAiKey(aiProvider, key);
+    if(!ok) return;
+
     aiApiKey = key;
-    aiProvider = document.getElementById("aiProvider").value;
     isAiConnected = true;
-    if(document.getElementById("aiSaveKey").checked) {
+    const shouldSave = confirm(currentLang === 'vi'
+        ? 'Kết nối thành công. Bạn có muốn lưu API trên trình duyệt này không?'
+        : 'Connected successfully. Do you want to remember this API key in this browser?');
+    if(shouldSave) {
         localStorage.setItem("aiApiKey", key); localStorage.setItem("aiProvider", aiProvider);
+        sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     } else {
         sessionStorage.setItem("aiApiKey", key); sessionStorage.setItem("aiProvider", aiProvider);
+        localStorage.removeItem("aiApiKey"); localStorage.removeItem("aiProvider");
     }
     document.body.classList.add("ai-theme");
+    syncProviderUI();
+    if(aiProvider === 'gemini') {
+        const burst = document.getElementById('geminiBurst');
+        burst.classList.remove('show'); void burst.offsetWidth; burst.classList.add('show');
+    }
+    addAiLog('response', `Connected ${aiProvider}. Persist=${shouldSave ? 'yes' : 'session only'}`);
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
@@ -530,15 +652,18 @@ function disconnectAi() {
     sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     document.getElementById("aiApiKey").value = "";
     document.body.classList.remove("ai-theme");
+    addAiLog('system', 'Disconnected AI service and cleared local/session key');
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
 function injectAiUI(tabId, isAI) {
     let authBlock = document.getElementById("globalAiAuth");
     let pill = document.getElementById("globalAiPill");
+    let logPanel = document.getElementById('aiLogPanel');
     let logicRow = document.getElementById(tabId === 'anime' ? "rowLogicA" : "rowLogicP");
 
     if(isAI) {
+        logPanel.classList.remove('hidden');
         if(!isAiConnected) {
             logicRow.after(authBlock); authBlock.classList.remove("hidden"); pill.classList.add("hidden");
         } else {
@@ -546,8 +671,9 @@ function injectAiUI(tabId, isAI) {
             document.getElementById("aiProviderName").innerText = aiProvider === 'gemini' ? 'Gemini' : 'ChatGPT';
         }
     } else {
-        if (authBlock.parentNode === logicRow.parentNode) authBlock.classList.add("hidden");
-        if (pill.parentNode === logicRow.parentNode) pill.classList.add("hidden");
+        authBlock.classList.add("hidden");
+        pill.classList.add("hidden");
+        logPanel.classList.add('hidden');
     }
 }
 
@@ -566,24 +692,29 @@ async function fetchAiKeys(promptText) {
     };
     try {
         let res, data, keys;
+        addAiLog('request', promptText.slice(0, 180));
         if (aiProvider === 'gemini') {
             res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${aiApiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bodyGemini)
             });
             data = await res.json();
             if(data.error) throw new Error(data.error.message);
-            let text = data.candidates[0].content.parts[0].text;
+            let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
             let parsed = JSON.parse(text); keys = parsed.keys || parsed;
+            addAiLog('response', text.slice(0, 220));
         } else {
             res = await fetch(`https://api.openai.com/v1/chat/completions`, {
                 method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${aiApiKey}` }, body: JSON.stringify(bodyGPT)
             });
             data = await res.json();
             if(data.error) throw new Error(data.error.message);
-            let parsed = JSON.parse(data.choices[0].message.content); keys = parsed.keys || parsed;
+            const content = data.choices?.[0]?.message?.content || '{}';
+            let parsed = JSON.parse(content); keys = parsed.keys || parsed;
+            addAiLog('response', content.slice(0, 220));
         }
         return Array.isArray(keys) ? keys : null;
     } catch (e) {
+        addAiLog('error', e.message);
         alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message); return null;
     }
 }
@@ -600,13 +731,13 @@ async function generateWithAi(tab) {
         let sf = isNaN(sfRaw) ? 1 : Math.min(sfRaw, isNaN(efRaw)?100:efRaw); let ef = isNaN(efRaw) ? 100 : Math.max(sfRaw||1, efRaw);
         let style = document.getElementById("animStyle").value; let poses = document.getElementById("poseCount").value || 5;
         let pacing = document.getElementById("corePacingAnime").value; let curve = document.getElementById("curveTypeAnime").value;
-        promptText = `I am animating a sequence. Start frame: ${sf}. End frame: ${ef}. Style: On ${style}s (meaning keys are optimally spaced by ${style} frames to simulate this style). I need to place exactly ${poses} main keyframes. The action pacing curve is '${pacing}' with a '${curve}' distribution. Please calculate and distribute the optimal exact frame numbers for these ${poses} keyframes. Return ONLY a JSON object: {"keys": [array of integers]}.`;
+        promptText = `I am animating a sequence. Start frame: ${sf}. End frame: ${ef}. Style: On ${style}s. Main keyframes: ${poses}. pacing='${pacing}', curve='${curve}'. Return ONLY JSON: {"keys": [integers]}.`;
     } else {
         let secRaw = parseFloat(document.getElementById("poseSeconds").value); let sec = isNaN(secRaw) || secRaw <= 0 ? 1 : secRaw;
         let fps = parseFloat(document.getElementById("fpsPose").value) || 24; let style = document.getElementById("animStylePose").value;
         let focus = document.getElementById("focusTypePose").value; let action = focus === 'char' ? document.getElementById("focusActionChar").value : document.getElementById("focusActionObj").value;
         let pacing = document.getElementById("corePacingPose").value; let totalFrames = Math.max(1, Math.round(sec * fps));
-        promptText = `I am estimating keyframes for an animation. Duration: ${sec} seconds. Base FPS: ${fps}. Total timeline: frame 1 to ${totalFrames}. Animation Style: On ${style}s. Focus: ${focus}. Specific Action: ${action}. Action Pacing: ${pacing}. Based on the action complexity and pacing, mathematically estimate how many main poses are necessary and optimally space them on the timeline from 1 to ${totalFrames}. Return ONLY a JSON object: {"keys": [array of integers]}.`;
+        promptText = `Estimate main keyframes for ${sec}s at ${fps}fps, total 1..${totalFrames}, style On ${style}s, focus=${focus}, action=${action}, pacing=${pacing}. Return ONLY JSON: {"keys": [integers]}.`;
     }
 
     let keys = await fetchAiKeys(promptText);
@@ -617,7 +748,6 @@ async function generateWithAi(tab) {
         else updatePoseEst(keys);
     }
 }
-
 // ================================================================
 
 let currentLang = "vi";
@@ -1148,17 +1278,18 @@ function toggleAnimePoseInput() {
     let logic = document.getElementById("calcLogic").value;
     let isAI = logic === "ai";
     injectAiUI('anime', isAI);
-    
+    document.getElementById('aiProviderAnime').classList.toggle('hidden', !isAI);
+
     let hideParams = isAI && !isAiConnected;
     document.getElementById("animeParams").classList.toggle("hidden", hideParams);
     document.getElementById("btnGenerateAiA").classList.toggle("hidden", !isAI);
 
     let isStatic = document.getElementById("focusState").value === "static";
     let style = document.getElementById("animStyle").value;
-    
+
     document.getElementById("poseRow").classList.toggle("hidden", isStatic || hideParams);
     document.getElementById("rowCorePacingA").classList.toggle("hidden", isStatic || hideParams);
-    document.getElementById("rowCurveTypeA").classList.toggle("hidden", isStatic || hideParams || isAI); // Disable manual custom curve editing when AI is ON
+    document.getElementById("rowCurveTypeA").classList.toggle("hidden", isStatic || hideParams);
     document.getElementById("rowForceA").classList.toggle("hidden", isStatic || style === "1" || hideParams);
 }
 
@@ -1285,6 +1416,7 @@ function togglePoseSettings() {
     let logic = document.getElementById("poseCalcMode").value;
     let isAI = logic === "ai";
     injectAiUI('pose', isAI);
+    document.getElementById('aiProviderPose').classList.toggle('hidden', !isAI);
 
     let hideParams = isAI && !isAiConnected;
     document.getElementById("poseParams").classList.toggle("hidden", hideParams);
