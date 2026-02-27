@@ -511,7 +511,7 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
     </div>
 
     <div id="aiLogPanel" class="ai-log-panel hidden">
-        <div class="ai-log-title">AI Request / Response Log</div>
+        <div class="ai-log-title">AI Command / Reply Log</div>
         <div id="aiLogList" class="ai-log-list"></div>
     </div>
 
@@ -571,12 +571,15 @@ function syncProviderUI() {
 function syncAiProviderFrom(tab) {
     aiProvider = getAiProviderSelect(tab).value;
     syncProviderUI();
-    addAiLog('config', `Provider switched to ${aiProvider}`);
 }
 
 function addAiLog(type, message) {
+    if(!['request', 'response'].includes(type)) return;
     const stamp = new Date().toLocaleTimeString('vi-VN', { hour12: false });
-    aiLogs.unshift(`[${stamp}] ${type.toUpperCase()}: ${message}`);
+    const prefix = type === 'request' ? 'SEND' : 'AI';
+    const entry = `[${stamp}] ${prefix}: ${message}`;
+    if(aiLogs[0] === entry) return;
+    aiLogs.unshift(entry);
     aiLogs = aiLogs.slice(0, 20);
     const box = document.getElementById('aiLogList');
     if(box) box.innerHTML = aiLogs.map(line => `<div class="ai-log-item">${line.replace(/</g, '&lt;')}</div>`).join('');
@@ -595,7 +598,6 @@ async function validateAiKey(provider, key) {
         }
         return true;
     } catch (e) {
-        addAiLog('error', e.message);
         alert((currentLang === 'vi' ? 'Không xác thực được API Key: ' : 'Failed to verify API Key: ') + e.message);
         return false;
     }
@@ -609,7 +611,6 @@ function initAI() {
         isAiConnected = true;
         document.body.classList.add("ai-theme");
         syncProviderUI();
-        addAiLog('system', `Recovered ${aiProvider} connection from browser storage`);
     }
 }
 
@@ -619,7 +620,6 @@ async function connectAi() {
 
     const activeTab = document.getElementById('animeMode').classList.contains('hidden') ? 'pose' : 'anime';
     aiProvider = getAiProviderSelect(activeTab).value;
-    addAiLog('request', `Connecting ${aiProvider}...`);
 
     const ok = await validateAiKey(aiProvider, key);
     if(!ok) return;
@@ -642,7 +642,6 @@ async function connectAi() {
         const burst = document.getElementById('geminiBurst');
         burst.classList.remove('show'); void burst.offsetWidth; burst.classList.add('show');
     }
-    addAiLog('response', `Connected ${aiProvider}. Persist=${shouldSave ? 'yes' : 'session only'}`);
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
@@ -652,7 +651,6 @@ function disconnectAi() {
     sessionStorage.removeItem("aiApiKey"); sessionStorage.removeItem("aiProvider");
     document.getElementById("aiApiKey").value = "";
     document.body.classList.remove("ai-theme");
-    addAiLog('system', 'Disconnected AI service and cleared local/session key');
     toggleAnimePoseInput(); togglePoseSettings(); updateAnime(); updatePoseEst();
 }
 
@@ -714,7 +712,7 @@ async function fetchAiKeys(promptText) {
         }
         return Array.isArray(keys) ? keys : null;
     } catch (e) {
-        addAiLog('error', e.message);
+        addAiLog('response', `ERROR: ${e.message}`);
         alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message); return null;
     }
 }
