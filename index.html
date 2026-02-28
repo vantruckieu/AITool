@@ -495,8 +495,9 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
                 </div>
             </div>
 
-            <button id="btnGenerateAiA" class="hidden ai-btn" onclick="generateWithAi('anime')" style="width:100%; padding:14px; margin-top:5px; border-radius:10px; font-size:15px; font-weight:bold; cursor:pointer;"><span id="txtBtnGenA">✨ Tự động tạo bằng AI</span></button>
         </div>
+
+        <button id="btnGenerateAiA" class="hidden ai-btn" onclick="generateWithAi('anime')" style="width:100%; padding:14px; margin-top:5px; border-radius:10px; font-size:15px; font-weight:bold; cursor:pointer;"><span id="txtBtnGenA">✨ Tự động tạo bằng AI</span></button>
         
         <div class="result" id="animeOutput">—</div>
         <div class="warning" id="warnMathModelAnime">⚠ Lưu ý: Mô hình đồ thị và toán học chỉ mang tính chất gợi ý tham khảo.</div>
@@ -605,8 +606,9 @@ footer .custom-select-trigger { padding: 8px 12px; font-size: 14px; border-radiu
                 </div>
             </div>
 
-            <button id="btnGenerateAiP" class="hidden ai-btn" onclick="generateWithAi('pose')" style="width:100%; padding:14px; margin-top:5px; border-radius:10px; font-size:15px; font-weight:bold; cursor:pointer;"><span id="txtBtnGenP">✨ Tự động tạo bằng AI</span></button>
         </div>
+
+        <button id="btnGenerateAiP" class="hidden ai-btn" onclick="generateWithAi('pose')" style="width:100%; padding:14px; margin-top:5px; border-radius:10px; font-size:15px; font-weight:bold; cursor:pointer;"><span id="txtBtnGenP">✨ Tự động tạo bằng AI</span></button>
         
         <div class="result" id="poseOutput">—</div>
         <div class="warning" id="warnMathModelPose">⚠ Lưu ý: Hệ thống chỉ tính toán gợi ý vị trí lý thuyết, mật độ thực tế phụ thuộc bản vẽ.</div>
@@ -795,14 +797,44 @@ function summarizeForLog(value, maxLen = 180) {
 
 function buildAiSystemInstruction() {
     return [
-        'Bạn là engine logic trong web tool tính toán.',
-        'Chỉ xử lý dữ liệu người dùng cung cấp, không trả lời ngoài phạm vi.',
-        'Không cảm xúc, không markdown, không icon, không văn bản thừa.',
+        'Bạn là engine logic dựng keyframe cho web tool tính toán animation.',
+        'Chỉ xử lý dữ liệu người dùng cung cấp trong phạm vi Anime/Pose keyframe.',
+        'Không trả lời lan man, không markdown, không emoji, không thêm văn bản ngoài JSON.',
         'BẮT BUỘC trả JSON hợp lệ theo format:',
-        '{"status":"success|error","analysis":"ngắn","result":"kết quả chính","confidence":"high|medium|low"}',
-        'Nếu thiếu dữ liệu thì status=error, result=null, confidence=low.',
-        'Với bài toán này, result PHẢI là mảng số nguyên keyframe (ví dụ [1,5,9]) hoặc object có keys và advice ngắn.'
+        '{"status":"success|error|refuse","analysis":"ngắn","result":{"keys":[integers],"advice":"ngắn","reason":"nếu từ chối"},"confidence":"high|medium|low"}',
+        'Nếu textbox không đúng trọng tâm animation keyframe hoặc thiếu dữ liệu cốt lõi thì status=refuse, result.keys=[], result.reason mô tả ngắn.',
+        'Nếu hợp lệ thì status=success và result.keys phải là mảng số nguyên tăng dần trong phạm vi frame hợp lệ của bài toán.'
     ].join(' ');
+}
+
+function isIdeaTextFocused(ideaText) {
+    const text = String(ideaText || '').toLowerCase().trim();
+    if(text.length < 12) return false;
+    const keywordGroups = [
+        ['key', 'keyframe', 'pose', 'khung', 'frame'],
+        ['camera', 'góc máy', 'nhịp', 'pacing', 'chuyển động', 'motion', 'timing'],
+        ['anime', 'toon', 'scene', 'cảnh', 'hành động', 'action']
+    ];
+    const hitGroups = keywordGroups.reduce((acc, group) => acc + (group.some(k => text.includes(k)) ? 1 : 0), 0);
+    return hitGroups >= 2;
+}
+
+function getIdeaFocusRefusalMessage() {
+    return currentLang === 'vi'
+        ? 'Nội dung textbox chưa đúng trọng tâm keyframe animation. Vui lòng nêu rõ bối cảnh cảnh quay, nhịp chuyển động và mục tiêu key/pose.'
+        : 'The textbox content is not focused on animation keyframes. Please describe scene context, pacing, and key/pose objective.';
+}
+
+function sanitizeAiKeys(rawKeys, minFrame, maxFrame) {
+    if(!Array.isArray(rawKeys)) return [];
+    const safeMin = Number.isFinite(minFrame) ? minFrame : 1;
+    const safeMax = Number.isFinite(maxFrame) ? maxFrame : Number.MAX_SAFE_INTEGER;
+    return [...new Set(rawKeys
+        .map(v => Number(v))
+        .filter(v => Number.isFinite(v))
+        .map(v => Math.round(v))
+        .filter(v => v >= safeMin && v <= safeMax)
+    )].sort((a,b) => a-b);
 }
 
 function playGeminiSpread(sourceEl) {
@@ -950,7 +982,8 @@ function injectAiUI(tabId, isAI) {
     }
 }
 
-async function fetchAiKeys(promptText, wantsAdvice = false) {
+async function fetchAiKeys(promptText, options = {}) {
+    const { wantsAdvice = false, minFrame = 1, maxFrame = Number.MAX_SAFE_INTEGER } = options;
     const systemInstruction = buildAiSystemInstruction();
     const bodyGemini = {
         systemInstruction: { parts: [{ text: systemInstruction }] },
@@ -965,14 +998,26 @@ async function fetchAiKeys(promptText, wantsAdvice = false) {
         ],
         response_format: { type: "json_object" }
     };
+
+    const parseAiPayload = (parsed) => {
+        const extracted = parsed?.result || parsed || {};
+        const rawKeys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed?.keys);
+        const safeKeys = sanitizeAiKeys(rawKeys, minFrame, maxFrame);
+        const status = String(parsed?.status || 'success').toLowerCase();
+        const advice = extracted?.advice || parsed?.advice || '';
+        const reason = extracted?.reason || parsed?.reason || '';
+        return { status, keys: safeKeys, advice, reason, confidence: parsed?.confidence || 'n/a' };
+    };
+
     try {
         setAiServiceHealth("degraded");
-        let res, data, keys;
+        let res, data, parsedPayload;
         addAiLog('request.prompt', `Input summary: ${summarizeForLog(promptText)}`);
         addAiLog('request.provider', aiProvider);
         addAiLog('request.http', aiProvider === 'gemini'
             ? 'POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
             : 'POST https://api.openai.com/v1/chat/completions');
+
         if (aiProvider === 'gemini') {
             addAiLog('request.body', `system+payload sent (${JSON.stringify(bodyGemini).length} chars)`);
             res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${aiApiKey}`, {
@@ -980,14 +1025,8 @@ async function fetchAiKeys(promptText, wantsAdvice = false) {
             });
             data = await res.json();
             if(data.error) throw new Error(data.error.message);
-            let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-            let parsed = JSON.parse(text);
-            const extracted = parsed.result || parsed;
-            keys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed.keys);
-            const advice = extracted?.advice || parsed.advice || "";
-            addAiLog('response.raw', `status=${parsed.status || 'n/a'}, confidence=${parsed.confidence || 'n/a'}, result=${summarizeForLog(JSON.stringify(keys || null), 120)}`);
-            setAiServiceHealth("stable");
-            return { keys: Array.isArray(keys) ? keys : null, advice: wantsAdvice ? advice : "" };
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+            parsedPayload = parseAiPayload(JSON.parse(text));
         } else {
             addAiLog('request.body', `system+payload sent (${JSON.stringify(bodyGPT).length} chars)`);
             res = await fetch(`https://api.openai.com/v1/chat/completions`, {
@@ -996,19 +1035,26 @@ async function fetchAiKeys(promptText, wantsAdvice = false) {
             data = await res.json();
             if(data.error) throw new Error(data.error.message);
             const content = data.choices?.[0]?.message?.content || '{}';
-            let parsed = JSON.parse(content);
-            const extracted = parsed.result || parsed;
-            keys = Array.isArray(extracted) ? extracted : (Array.isArray(extracted?.keys) ? extracted.keys : parsed.keys);
-            const advice = extracted?.advice || parsed.advice || "";
-            addAiLog('response.raw', `status=${parsed.status || 'n/a'}, confidence=${parsed.confidence || 'n/a'}, result=${summarizeForLog(JSON.stringify(keys || null), 120)}`);
-            setAiServiceHealth("stable");
-            return { keys: Array.isArray(keys) ? keys : null, advice: wantsAdvice ? advice : "" };
+            parsedPayload = parseAiPayload(JSON.parse(content));
         }
-        return { keys: Array.isArray(keys) ? keys : null, advice: "" };
+
+        addAiLog('response.raw', `status=${parsedPayload.status}, confidence=${parsedPayload.confidence}, keys=${summarizeForLog(JSON.stringify(parsedPayload.keys || []), 120)}`);
+        setAiServiceHealth("stable");
+
+        if(parsedPayload.status === 'refuse') {
+            return { status: 'refuse', keys: null, advice: wantsAdvice ? parsedPayload.reason || parsedPayload.advice : '', reason: parsedPayload.reason || '' };
+        }
+
+        if(parsedPayload.status !== 'success' || !parsedPayload.keys.length) {
+            return { status: 'error', keys: null, advice: wantsAdvice ? parsedPayload.advice : '', reason: parsedPayload.reason || 'invalid_or_empty_keys' };
+        }
+
+        return { status: 'success', keys: parsedPayload.keys, advice: wantsAdvice ? parsedPayload.advice : '', reason: '' };
     } catch (e) {
         addAiLog('error', e.message);
         setAiServiceHealth("offline");
-        alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message); return { keys: null, advice: "" };
+        alert((currentLang === 'vi' ? "Lỗi kết nối AI: " : "AI Connection Error: ") + e.message);
+        return { status: 'error', keys: null, advice: "", reason: e.message };
     }
 }
 
@@ -1023,37 +1069,62 @@ async function generateWithAi(tab) {
     const ideaText = (document.getElementById("aiIdeaInput")?.value || "").trim();
     const hasConsent = !!document.getElementById("aiIdeaConsent")?.checked;
     setAiAdvice("");
+
+    let minFrame = 1;
+    let maxFrame = Number.MAX_SAFE_INTEGER;
+
     if (tab === 'anime') {
         let sfRaw = parseInt(document.getElementById("startFrame").value); let efRaw = parseInt(document.getElementById("endFrame").value);
         let sf = isNaN(sfRaw) ? 1 : Math.min(sfRaw, isNaN(efRaw)?100:efRaw); let ef = isNaN(efRaw) ? 100 : Math.max(sfRaw||1, efRaw);
+        minFrame = sf; maxFrame = ef;
         let style = document.getElementById("animStyle").value; let poses = document.getElementById("poseCount").value || 5;
         let pacing = document.getElementById("corePacingAnime").value; let curve = document.getElementById("curveTypeAnime").value;
         if(isIdeaMode) {
             if(!hasConsent) { alert(currentLang === "vi" ? "Bạn cần đồng ý cảnh báo quyền riêng tư trước." : "Please accept the privacy warning first."); btn.innerHTML = oriText; btn.disabled = false; return; }
             if(!ideaText) { alert(currentLang === "vi" ? "Hãy nhập ý tưởng để AI phân tích." : "Please provide your idea."); btn.innerHTML = oriText; btn.disabled = false; return; }
-            promptText = `Bạn là engine dựng keyframe. Bối cảnh anime: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Ý tưởng người dùng: ${ideaText}. Trả JSON hợp lệ: {"status":"success|error","analysis":"ngắn","result":{"keys":[integers],"advice":"lời khuyên ngắn"},"confidence":"high|medium|low"}.`;
+            if(!isIdeaTextFocused(ideaText)) {
+                const refusal = getIdeaFocusRefusalMessage();
+                addAiLog('refuse.local', refusal);
+                alert(refusal);
+                btn.innerHTML = oriText; btn.disabled = false; return;
+            }
+            promptText = `Bạn là engine dựng keyframe. Bối cảnh anime: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Ý tưởng người dùng: ${ideaText}. BẮT BUỘC chỉ trả JSON hợp lệ theo schema và chỉ trong phạm vi frame ${sf}-${ef}; nếu ý tưởng lệch trọng tâm animation keyframe thì status=refuse.`;
         } else {
-            promptText = `Nhiệm vụ: tính keyframe chính cho animation. Dữ liệu: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Xuất JSON chuẩn, result là mảng số nguyên keyframe.`;
+            promptText = `Nhiệm vụ: tính keyframe chính cho animation. Dữ liệu: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Xuất JSON chuẩn, result là mảng số nguyên keyframe nằm trong ${sf}-${ef}.`;
         }
     } else {
         let secRaw = parseFloat(document.getElementById("poseSeconds").value); let sec = isNaN(secRaw) || secRaw <= 0 ? 1 : secRaw;
         let fps = parseFloat(document.getElementById("fpsPose").value) || 24; let style = document.getElementById("animStylePose").value;
         let focus = document.getElementById("focusTypePose").value; let action = focus === 'char' ? document.getElementById("focusActionChar").value : document.getElementById("focusActionObj").value;
         let pacing = document.getElementById("corePacingPose").value; let totalFrames = Math.max(1, Math.round(sec * fps));
+        minFrame = 1; maxFrame = totalFrames;
         if(isIdeaMode) {
             if(!hasConsent) { alert(currentLang === "vi" ? "Bạn cần đồng ý cảnh báo quyền riêng tư trước." : "Please accept the privacy warning first."); btn.innerHTML = oriText; btn.disabled = false; return; }
             if(!ideaText) { alert(currentLang === "vi" ? "Hãy nhập ý tưởng để AI phân tích." : "Please provide your idea."); btn.innerHTML = oriText; btn.disabled = false; return; }
-            promptText = `Bạn là engine dựng keyframe. Bối cảnh pose: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Ý tưởng người dùng: ${ideaText}. Trả JSON hợp lệ: {"status":"success|error","analysis":"ngắn","result":{"keys":[integers],"advice":"lời khuyên ngắn"},"confidence":"high|medium|low"}.`;
+            if(!isIdeaTextFocused(ideaText)) {
+                const refusal = getIdeaFocusRefusalMessage();
+                addAiLog('refuse.local', refusal);
+                alert(refusal);
+                btn.innerHTML = oriText; btn.disabled = false; return;
+            }
+            promptText = `Bạn là engine dựng keyframe. Bối cảnh pose: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Ý tưởng người dùng: ${ideaText}. BẮT BUỘC chỉ trả JSON hợp lệ theo schema và keys trong phạm vi 1-${totalFrames}; nếu ý tưởng lệch trọng tâm animation keyframe thì status=refuse.`;
         } else {
-            promptText = `Nhiệm vụ: ước tính keyframe chính. Dữ liệu: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Xuất JSON chuẩn, result là mảng số nguyên keyframe.`;
+            promptText = `Nhiệm vụ: ước tính keyframe chính. Dữ liệu: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Xuất JSON chuẩn, result là mảng số nguyên keyframe nằm trong 1-${totalFrames}.`;
         }
     }
 
-    let aiResult = await fetchAiKeys(promptText, isIdeaMode);
+    let aiResult = await fetchAiKeys(promptText, { wantsAdvice: isIdeaMode, minFrame, maxFrame });
     let keys = aiResult?.keys || null;
     btn.innerHTML = oriText; btn.disabled = false;
 
     if (aiResult?.advice) setAiAdvice(aiResult.advice);
+
+    if(aiResult?.status === 'refuse') {
+        const msg = aiResult.reason || aiResult.advice || getIdeaFocusRefusalMessage();
+        addAiLog('refuse.remote', msg);
+        alert(msg);
+        return;
+    }
 
     if (keys && keys.length > 0) {
         if(tab === 'anime') updateAnime(keys);
