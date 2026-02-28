@@ -802,27 +802,9 @@ function buildAiSystemInstruction() {
         'Không trả lời lan man, không markdown, không emoji, không thêm văn bản ngoài JSON.',
         'BẮT BUỘC trả JSON hợp lệ theo format:',
         '{"status":"success|error|refuse","analysis":"ngắn","result":{"keys":[integers],"advice":"ngắn","reason":"nếu từ chối"},"confidence":"high|medium|low"}',
-        'Nếu textbox không đúng trọng tâm animation keyframe hoặc thiếu dữ liệu cốt lõi thì status=refuse, result.keys=[], result.reason mô tả ngắn.',
+        'Nếu textbox không đúng trọng tâm animation keyframe hoặc thiếu dữ liệu cốt lõi thì status=refuse, result.keys=[], result.reason phải nêu rõ sai ở đâu và cần bổ sung gì.',
         'Nếu hợp lệ thì status=success và result.keys phải là mảng số nguyên tăng dần trong phạm vi frame hợp lệ của bài toán.'
     ].join(' ');
-}
-
-function isIdeaTextFocused(ideaText) {
-    const text = String(ideaText || '').toLowerCase().trim();
-    if(text.length < 12) return false;
-    const keywordGroups = [
-        ['key', 'keyframe', 'pose', 'khung', 'frame'],
-        ['camera', 'góc máy', 'nhịp', 'pacing', 'chuyển động', 'motion', 'timing'],
-        ['anime', 'toon', 'scene', 'cảnh', 'hành động', 'action']
-    ];
-    const hitGroups = keywordGroups.reduce((acc, group) => acc + (group.some(k => text.includes(k)) ? 1 : 0), 0);
-    return hitGroups >= 2;
-}
-
-function getIdeaFocusRefusalMessage() {
-    return currentLang === 'vi'
-        ? 'Nội dung textbox chưa đúng trọng tâm keyframe animation. Vui lòng nêu rõ bối cảnh cảnh quay, nhịp chuyển động và mục tiêu key/pose.'
-        : 'The textbox content is not focused on animation keyframes. Please describe scene context, pacing, and key/pose objective.';
 }
 
 function sanitizeAiKeys(rawKeys, minFrame, maxFrame) {
@@ -1082,12 +1064,6 @@ async function generateWithAi(tab) {
         if(isIdeaMode) {
             if(!hasConsent) { alert(currentLang === "vi" ? "Bạn cần đồng ý cảnh báo quyền riêng tư trước." : "Please accept the privacy warning first."); btn.innerHTML = oriText; btn.disabled = false; return; }
             if(!ideaText) { alert(currentLang === "vi" ? "Hãy nhập ý tưởng để AI phân tích." : "Please provide your idea."); btn.innerHTML = oriText; btn.disabled = false; return; }
-            if(!isIdeaTextFocused(ideaText)) {
-                const refusal = getIdeaFocusRefusalMessage();
-                addAiLog('refuse.local', refusal);
-                alert(refusal);
-                btn.innerHTML = oriText; btn.disabled = false; return;
-            }
             promptText = `Bạn là engine dựng keyframe. Bối cảnh anime: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Ý tưởng người dùng: ${ideaText}. BẮT BUỘC chỉ trả JSON hợp lệ theo schema và chỉ trong phạm vi frame ${sf}-${ef}; nếu ý tưởng lệch trọng tâm animation keyframe thì status=refuse.`;
         } else {
             promptText = `Nhiệm vụ: tính keyframe chính cho animation. Dữ liệu: start_frame=${sf}, end_frame=${ef}, style_on=${style}, key_pose_target=${poses}, pacing=${pacing}, curve=${curve}. Xuất JSON chuẩn, result là mảng số nguyên keyframe nằm trong ${sf}-${ef}.`;
@@ -1101,12 +1077,6 @@ async function generateWithAi(tab) {
         if(isIdeaMode) {
             if(!hasConsent) { alert(currentLang === "vi" ? "Bạn cần đồng ý cảnh báo quyền riêng tư trước." : "Please accept the privacy warning first."); btn.innerHTML = oriText; btn.disabled = false; return; }
             if(!ideaText) { alert(currentLang === "vi" ? "Hãy nhập ý tưởng để AI phân tích." : "Please provide your idea."); btn.innerHTML = oriText; btn.disabled = false; return; }
-            if(!isIdeaTextFocused(ideaText)) {
-                const refusal = getIdeaFocusRefusalMessage();
-                addAiLog('refuse.local', refusal);
-                alert(refusal);
-                btn.innerHTML = oriText; btn.disabled = false; return;
-            }
             promptText = `Bạn là engine dựng keyframe. Bối cảnh pose: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Ý tưởng người dùng: ${ideaText}. BẮT BUỘC chỉ trả JSON hợp lệ theo schema và keys trong phạm vi 1-${totalFrames}; nếu ý tưởng lệch trọng tâm animation keyframe thì status=refuse.`;
         } else {
             promptText = `Nhiệm vụ: ước tính keyframe chính. Dữ liệu: seconds=${sec}, fps=${fps}, total_frames=${totalFrames}, style_on=${style}, focus=${focus}, action=${action}, pacing=${pacing}. Xuất JSON chuẩn, result là mảng số nguyên keyframe nằm trong 1-${totalFrames}.`;
@@ -1120,7 +1090,7 @@ async function generateWithAi(tab) {
     if (aiResult?.advice) setAiAdvice(aiResult.advice);
 
     if(aiResult?.status === 'refuse') {
-        const msg = aiResult.reason || aiResult.advice || getIdeaFocusRefusalMessage();
+        const msg = aiResult.reason || aiResult.advice || (currentLang === 'vi' ? 'Yêu cầu bị từ chối vì chưa đúng quy tắc keyframe. Vui lòng mô tả rõ hơn theo ngữ cảnh animation.' : 'Request was refused because it does not meet keyframe rules. Please provide clearer animation context.');
         addAiLog('refuse.remote', msg);
         alert(msg);
         return;
