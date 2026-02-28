@@ -685,12 +685,6 @@ function applyAiThemeMode() {
     updateAiConnBar();
 }
 
-function shouldShowAiModeWrap() {
-    const animeAi = document.getElementById('calcLogic')?.value === 'ai';
-    const poseAi = document.getElementById('poseCalcMode')?.value === 'ai';
-    return isAiConnected && (animeAi || poseAi);
-}
-
 function setAiInputMode(mode) {
     aiInputMode = mode === 'idea' ? 'idea' : 'raw';
     const rawBtn = document.getElementById('aiModeRawBtn');
@@ -923,6 +917,8 @@ function injectAiUI(tabId, isAI) {
     let modeWrap = document.getElementById('aiInputModeWrap');
     let logicRow = document.getElementById(tabId === 'anime' ? "rowLogicA" : "rowLogicP");
     let modePanel = document.getElementById(tabId === 'anime' ? 'animeMode' : 'poseMode');
+    const isActivePanel = modePanel && !modePanel.classList.contains('hidden');
+    if(!isActivePanel) return;
 
     if(isAI) {
         if(modePanel && logPanel && logPanel.parentElement !== modePanel) modePanel.appendChild(logPanel);
@@ -932,11 +928,17 @@ function injectAiUI(tabId, isAI) {
         }
         if(!isAiConnected) {
             if(modeWrap) modeWrap.classList.add('hidden');
-            logicRow.after(authBlock); authBlock.classList.remove("hidden"); pill.classList.add("hidden");
+            logicRow.after(authBlock);
+            authBlock.classList.remove("hidden");
+            pill.classList.add("hidden");
         } else {
             authBlock.classList.add("hidden");
+            logicRow.after(pill);
             pill.classList.remove("hidden");
-            modeWrap.classList.toggle('hidden', !shouldShowAiModeWrap());
+            if(modeWrap) {
+                pill.after(modeWrap);
+                modeWrap.classList.remove('hidden');
+            }
             document.getElementById("aiProviderName").innerText = aiProvider === 'gemini' ? 'Gemini' : 'ChatGPT';
         }
     } else {
